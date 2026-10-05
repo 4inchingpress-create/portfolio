@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="북디자이너 아침의 작업실. 책을 짓고, 해체하고, 한 사람의 이야기에 옷을 입힙니다.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="book is open door — 책은 열린 문이다">
+<meta property="og:description" content="북디자이너 아침의 작업실. 책을 짓고, 해체하고, 한 사람의 이야기에 옷을 입힙니다.">
+<meta property="og:url" content="https://4inchingpress-create.github.io/portfolio/">
+<meta property="og:image" content="https://4inchingpress-create.github.io/portfolio/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>book is open door — 4inching press</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond&family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+<style>
+  /* 세명조: 이 컴퓨터에 설치돼 있으면 그걸 쓰고,
+     fonts 폴더에 웹폰트 파일을 넣으면 모든 방문자에게 세명조로 보입니다. */
+  @font-face {
+    font-family: "SeMyungjo";
+    src: local("SM세명조"), local("SMSeMyungJo"), local("SMSeMyungJo-Regular"),
+         local("SM SeMyungJo Std"), local("SMSeMyungJoStd-Regular"),
+         url("fonts/SMSeMyungJo.woff2") format("woff2");
+    font-display: swap;
+  }
+  :root {
+    --bg: #070303;
+    --text: #EEEAE2;
+    --frame: #221D1D;
+    --serif: "SeMyungjo", "EB Garamond", "Nanum Myeongjo", serif;
+    /* 일러스트 대지 2410 × 1530 을 화면에 맞춘 단위 */
+    --u: min(calc(100vw / 2410), calc(100vh / 1530));
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--serif);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  .stage {
+    position: relative;
+    width: calc(var(--u) * 2410);
+    height: calc(var(--u) * 1530);
+    flex: none;
+  }
+
+  /* 제목 */
+  .head {
+    position: absolute;
+    left: calc(var(--u) * 136); right: calc(var(--u) * 148); top: calc(var(--u) * 70);
+    display: grid; grid-template-columns: auto 1fr auto;
+    column-gap: calc(var(--u) * 68);
+    font-weight: 400;
+  }
+  .head .en { display: block; font-size: calc(var(--u) * 150); line-height: 1; letter-spacing: -.01em; }
+  .head .ko { display: block; margin-top: calc(var(--u) * 40); font-size: calc(var(--u) * 106); line-height: 1; letter-spacing: .02em; }
+  .head .r { text-align: right; }
+  .head .rule { height: calc(var(--u) * 2.5); background: var(--text); margin-top: calc(var(--u) * 90); }
+
+  /* 문틀 */
+  .frame {
+    position: absolute;
+    left: calc(var(--u) * 804); top: calc(var(--u) * 236);
+    width: calc(var(--u) * 732); height: calc(var(--u) * 1182);
+    border: calc(var(--u) * 2.5) solid var(--frame); border-bottom: 0;
+  }
+
+  /* 문(책) 자리 */
+  .doorwrap {
+    position: absolute;
+    left: calc(var(--u) * 899); top: calc(var(--u) * 306);
+    width: calc(var(--u) * 564); height: calc(var(--u) * 1145);
+    --H: calc(var(--u) * 1145);
+  }
+
+  /* ───────── 큰 문 = 책 ───────── */
+  .book {
+    position: relative; width: 100%; height: 100%;
+    perspective: 2400px;
+    transition: transform 2.2s cubic-bezier(.45,.05,.2,1);
+  }
+  .book.open { transform: translateX(50%) scale(.9); }
+
+  /* 문 뒤 페이지 */
+  .page {
+    position: absolute; inset: 0;
+    background: #FBF8F1; color: #1A1A1A;
+    container-type: size;
+  }
+  .page::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 12%;
+    background: linear-gradient(90deg, rgba(0,0,0,.10), rgba(0,0,0,0));
+  }
+  .page-in {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 16cqw 13cqw 10cqw; text-align: center;
+  }
+  .page-in .small { font-size: max(11px, 3.6cqw); color: #8C8577; }
+  .page-in .statement { margin-top: 30cqw; font-size: max(12px, 4.4cqw); line-height: 2; color: #2E2A26; word-break: keep-all; }
+  .page-in .sign { margin-top: 10cqw; font-size: max(12px, 4.4cqw); }
+  .page-in .close { margin-top: auto; font-size: max(11px, 3.6cqw); border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+  .page-in .folio { margin-top: 5cqw; font-size: max(10px, 3.4cqw); color: #8C8577; }
+
+  /* 표지 */
+  .cover {
+    position: absolute; inset: 0;
+    transform-origin: left center; transform-style: preserve-3d;
+    transition: transform 2.2s cubic-bezier(.45,.05,.2,1);
+    z-index: 10;
+  }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .face.front { background: #fff; cursor: pointer; }
+  a.box { cursor: pointer; }
+  .face.back { transform: rotateY(180deg); background: #FBF8F1; container-type: size; }
+  .face.back::after {
+    content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: 12%;
+    background: linear-gradient(270deg, rgba(0,0,0,.10), rgba(0,0,0,0));
+  }
+  .face.back .folio { position: absolute; left: 0; right: 0; bottom: 10cqw; text-align: center; font-size: max(10px, 3.4cqw); color: #8C8577; }
+  .face.back .hint { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font-size: max(11px, 3.6cqw); color: #A49C8D; opacity: 0; transition: opacity .4s; }
+  .book.peek .cover { transform: rotateY(-30deg); transition: transform 1.2s cubic-bezier(.45,.05,.2,1); }
+  .book.open .cover { transform: rotateY(-180deg); }
+  .book.open .face.front { pointer-events: none; }
+  .book.open .face.back { cursor: pointer; }
+  .book.open.lift .cover { transform: rotateY(-158deg); transition: transform .7s cubic-bezier(.3,.7,.2,1); }
+  .book.open.lift .face.back .hint { opacity: 1; }
+
+  /* 손잡이: 검정 동그라미 */
+  .knob {
+    position: absolute;
+    top: calc(463 / 1145 * 100%);
+    width: calc(34 / 564 * 100%); aspect-ratio: 1;
+    border-radius: 50%; background: #0B0808;
+    z-index: 20;
+    transition: transform .3s;
+  }
+  .face.front .knob { left: calc(472 / 564 * 100%); }
+  .face.back .knob { left: calc(58 / 564 * 100%); background: #C9C1B2; }
+  .knob::after { content: ""; position: absolute; inset: -14px; border-radius: 50%; }
+  .face.front .knob:hover { transform: scale(1.15); }
+  .knob:focus-visible, .close:focus-visible { outline: 2px solid #1A1A1A; outline-offset: 4px; }
+
+  /* ───────── 문 위의 색면들. 좌표는 문 크기 564 × 1145 기준 ───────── */
+  .box {
+    position: absolute;
+    left:   calc(var(--x) / 564 * 100%);
+    top:    calc(var(--y) / 1145 * 100%);
+    width:  calc(var(--w) / 564 * 100%);
+    height: calc(var(--h) / 1145 * 100%);
+    background: var(--c);
+  }
+  a.box { background: none; outline: none; z-index: 1; }
+  a.box:hover, a.box:focus-visible, a.box.active { z-index: 5; }
+  .room-in {
+    position: absolute; inset: 0; overflow: hidden;
+    background: var(--in); clip-path: inset(1px);
+    container-type: size;
+  }
+  a.box:hover .room-in, a.box:focus-visible .room-in, a.box.active .room-in { clip-path: none; }
+  .room-in b {
+    position: absolute; left: 10cqw; top: 7cqh;
+    font-weight: 400;
+    font-size: clamp(11px, calc(var(--H) * .019), 16px);
+    line-height: 1.2;
+    color: var(--label, #F6F2EA);
+  }
+  .leaf {
+    position: absolute; inset: 0;
+    background: var(--c);
+    transform-origin: left center;
+    transition: transform .6s cubic-bezier(.5,0,.2,1);
+    z-index: 2;
+  }
+  a.box:hover .leaf, a.box:focus-visible .leaf, a.box.active .leaf { transform: scaleX(-.14) skewY(-10deg); }
+  a.box:focus-visible .room-in { outline: 2px solid #1A1A1A; outline-offset: 3px; }
+
+  /* 세로 화면(휴대폰) */
+  @media (max-aspect-ratio: 4/5) {
+    body { overflow: auto; align-items: flex-start; }
+    .stage { width: 100vw; height: auto; min-height: 100vh; padding: 28px 18px 40px; }
+    .head { position: static; column-gap: 12px; }
+    .head .en { font-size: 9.5vw; }
+    .head .ko { font-size: 6.6vw; margin-top: 6px; }
+    .head .rule { margin-top: 5.5vw; height: 1px; }
+    .frame { display: none; }
+    .doorwrap {
+      position: relative; left: auto; top: auto;
+      margin: 9vh auto 0;
+      width: 44vw; height: calc(44vw * 1145 / 564);
+      --H: calc(44vw * 1145 / 564);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .book, .cover, .leaf { transition: none !important; }
+  }
+</style>
+<style id="button-cursor">
+  /* 마우스 커서: 분홍 단추 (누를 수 있는 곳에서는 조금 커진다) */
+  html, body { cursor: url("data:image/png;base64,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") 13 13, auto; }
+  a, button, [role="button"], label, summary, select, .spot, .spot *, .tg, .bk, .vol, .story, .chip, .env, .mark, .tab, .box, .knob, .lever, .room-in {
+    cursor: url("data:image/png;base64,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") 18 18, pointer !important; }
+  input[type="text"], textarea { cursor: text; }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <header class="head">
+    <div class="l"><span class="en">book is</span><span class="ko">책은</span></div>
+    <i class="rule" aria-hidden="true"></i>
+    <div class="r"><span class="en">open door</span><span class="ko">열린 문이다</span></div>
+  </header>
+
+  <div class="frame" aria-hidden="true"></div>
+
+  <div class="doorwrap">
+    <div class="book" id="book">
+
+      <!-- 문을 열면 보이는 페이지 -->
+      <div class="page" id="statement" aria-hidden="true">
+        <div class="page-in">
+          <span class="small">4inching press, book design</span>
+          <p class="statement">표지는 문짝이고 판형은 문틀입니다.<br>한 권의 책에 꼭 맞는 문을 짓고,<br>누군가 그 문을 열고 들어가<br>자기 자리를 찾게 하는 일을 합니다.</p>
+          <span class="sign">사인칭 북디자인</span>
+          <button class="close" id="close" tabindex="-1">close the book</button>
+          <span class="folio">一</span>
+        </div>
+      </div>
+
+      <!-- 큰 문(표지) -->
+      <div class="cover" id="cover">
+        <div class="face back" id="backface" aria-hidden="true">
+          <button class="knob" id="knobBack" aria-label="책 덮기" tabindex="-1"></button>
+          <span class="hint">click to close</span>
+          <span class="folio">〇</span>
+        </div>
+        <div class="face front door" id="frontface" aria-label="색면으로 된 문">
+          <button class="knob" id="knob" aria-label="큰 문 열기"></button>
+
+          <!-- 장식 -->
+          <div class="box" style="--x:75; --y:67; --w:136; --h:37; --c:#42BFEC"></div>
+
+          <!-- 문이 되는 색면: 링크와 이름만 바꾸면 됩니다 -->
+          <a class="box" href="sainching/" aria-label="4inching press"
+             style="--x:354; --y:67; --w:158; --h:220; --c:#F4C9DC; --in:#2B2440">
+            <span class="room-in"><b>4inching<br>press</b></span><span class="leaf"></span>
+          </a>
+          <a class="box" href="book/" aria-label="book, 책을 해체하라"
+             style="--x:70; --y:432; --w:167; --h:96; --c:#F5CE8E; --in:#42BFEC; --label:#1D2A4A">
+            <span class="room-in"><b>book</b></span><span class="leaf"></span>
+          </a>
+          <a class="box" href="design/" aria-label="book design"
+             style="--x:75; --y:730; --w:72; --h:357; --c:#B92D55; --in:#F3E6DC; --label:#B92D55">
+            <span class="room-in"><b>book<br>design</b></span><span class="leaf"></span>
+          </a>
+          <a class="box" href="booktailor/" aria-label="booktailor shop"
+             style="--x:262; --y:730; --w:254; --h:356; --c:#1C776A; --in:#F3E6DC; --label:#1C776A">
+            <span class="room-in"><b>booktailor<br>shop</b></span><span class="leaf"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const book = document.getElementById('book');
+  const knob = document.getElementById('knob');
+  const knobBack = document.getElementById('knobBack');
+  const closeBtn = document.getElementById('close');
+  const backface = document.getElementById('backface');
+  const statement = document.getElementById('statement');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const touch = window.matchMedia('(hover: none)').matches;
+  const boxes = document.querySelectorAll('a.box');
+
+  function openDoor() {
+    book.classList.remove('peek'); book.classList.add('open');
+    statement.setAttribute('aria-hidden', 'false');
+    closeBtn.tabIndex = 0; knobBack.tabIndex = 0; knob.tabIndex = -1;
+    boxes.forEach(b => b.tabIndex = -1);
+  }
+  function closeDoor() {
+    book.classList.remove('open', 'lift');
+    statement.setAttribute('aria-hidden', 'true');
+    closeBtn.tabIndex = -1; knobBack.tabIndex = -1;
+    knob.removeAttribute('tabindex');
+    boxes.forEach(b => b.removeAttribute('tabindex'));
+    knob.focus({ preventScroll: true });
+  }
+
+  // 처음 들어오면 문이 한 번 살짝 열렸다 닫힌다
+  let seen = false;
+  try { seen = sessionStorage.getItem('peeked') === '1'; sessionStorage.setItem('peeked', '1'); } catch (e) {}
+  if (!reduce && !seen) {
+    setTimeout(() => book.classList.add('peek'), 800);
+    setTimeout(() => book.classList.remove('peek'), 2000);
+  }
+
+  knob.addEventListener('mouseenter', () => { if (!book.classList.contains('open')) book.classList.add('peek'); });
+  knob.addEventListener('mouseleave', () => book.classList.remove('peek'));
+  knob.addEventListener('click', e => { e.stopPropagation(); openDoor(); });
+  // 흰 문 어디를 눌러도 열린다 (색면 문은 각자의 방으로)
+  const frontface = document.getElementById('frontface');
+  frontface.addEventListener('click', e => {
+    if (e.target.closest('a.box')) return;
+    if (!book.classList.contains('open')) openDoor();
+  });
+  closeBtn.addEventListener('click', closeDoor);
+  knobBack.addEventListener('click', e => { e.stopPropagation(); closeDoor(); });
+  backface.addEventListener('mouseenter', () => { if (book.classList.contains('open')) book.classList.add('lift'); });
+  backface.addEventListener('mouseleave', () => book.classList.remove('lift'));
+  backface.addEventListener('click', () => { if (book.classList.contains('open')) closeDoor(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && book.classList.contains('open')) closeDoor(); });
+
+  // 터치 화면: 작은 문은 첫 탭에 열리고 두 번째 탭에 들어간다
+  if (touch) {
+    boxes.forEach(box => box.addEventListener('click', e => {
+      if (!box.classList.contains('active')) {
+        e.preventDefault();
+        boxes.forEach(b => b.classList.remove('active'));
+        box.classList.add('active');
+      }
+    }));
+    document.addEventListener('click', e => { if (!e.target.closest('a.box')) boxes.forEach(b => b.classList.remove('active')); });
+  }
+  window.addEventListener('pageshow', () => boxes.forEach(b => b.classList.remove('active')));
+</script>
+</body>
+</html>

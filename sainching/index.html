@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="description" content="하나의 물음표에서 시작하는 책들.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="4inching press — 물음표 시점으로 책을 만듭니다">
+<meta property="og:description" content="하나의 물음표에서 시작하는 책들.">
+<meta property="og:url" content="https://4inchingpress-create.github.io/portfolio/sainching/">
+<meta property="og:image" content="https://4inchingpress-create.github.io/portfolio/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>4inching press — 물음표 시점으로 책을 만듭니다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: "SeMyungjo";
+    src: local("SM세명조"), local("SMSeMyungJo"), local("SMSeMyungJo-Regular"),
+         local("SM SeMyungJo Std"), local("SMSeMyungJoStd-Regular"),
+         url("../fonts/SMSeMyungJo.woff2") format("woff2");
+    font-display: swap;
+  }
+  :root {
+    --bg: #070303; --text: #EEEAE2; --muted: #8C877F; --ink: #1B1714; --edge: #1B1714;
+    --serif: "SeMyungjo", "EB Garamond", "Nanum Myeongjo", serif;
+    --wide: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --tabw: 250px; --tabh: 50px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--serif); display: flex; flex-direction: column; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  .head { display: grid; grid-template-columns: auto 1fr auto; column-gap: 2.8vw; padding: max(18px, 2.6vw) 5.6vw 1vw; }
+  .head .en { display: block; font-size: min(6.2vw, 10vh); line-height: 1; letter-spacing: -.01em; }
+  .head .ko { display: block; margin-top: .9vw; font-size: min(4.2vw, 7vh); line-height: 1.05; letter-spacing: .02em; }
+  .head .r { text-align: right; }
+  .head .rule { height: 1.5px; background: var(--text); margin-top: min(3.8vw, 6.2vh); }
+
+  /* 겹겹이 꽂힌 인덱스 종이. 맨 위 탭은 검정 바탕 위로 튀어나온다 */
+  .folders { margin: 0 5.6vw; padding-top: calc(var(--tabh) + 10px); }
+  .layer { position: relative; background: var(--c); border-top: 1px solid var(--edge); }
+  .layer + .layer, .layer + .cover { margin-top: -1px; }
+
+  /* 탭: 비스듬한 옆선과 둥근 어깨 (사다리꼴) */
+  .tab {
+    position: absolute; bottom: 100%; left: var(--x);
+    height: var(--tabh); margin-bottom: -1px; padding: 0 34px;
+    color: var(--ink);
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    transition: transform .3s cubic-bezier(.3,.7,.2,1);
+  }
+  .tab svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .tab svg path.fill { fill: var(--tc); }
+  .tab svg path.edge { fill: none; stroke: #1B1714; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .tab .lab { position: relative; font-size: clamp(14px, 1.15vw, 17px); white-space: nowrap; letter-spacing: .01em; }
+  .layer:not(.open) .tab:hover { transform: translateY(-4px); }
+  .tab:focus-visible { outline: none; }
+  .tab:focus-visible .lab { text-decoration: underline; text-underline-offset: 4px; }
+
+  .body { height: 64px; overflow: hidden; transition: height .55s cubic-bezier(.3,.7,.2,1); color: var(--ink); }
+  .layer.open .body { height: var(--open, 270px); }
+  .inner { padding: 42px 5% 34px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.4fr); gap: 5%; opacity: 0; transition: opacity .35s .15s; }
+  .layer.open .inner { opacity: 1; }
+  .meta { font-size: 15px; line-height: 1.75; }
+  .inner.quote { grid-template-columns: 1fr; }
+  .qt { font-size: clamp(28px, 3.4vw, 50px); line-height: 1.35; word-break: keep-all; }
+  .qt cite { display: block; margin-top: .6em; font-style: normal; font-size: .36em; letter-spacing: .02em; opacity: .7; }
+  .meta .t { font-size: clamp(22px, 2vw, 28px); }
+  .meta .dim { opacity: .65; }
+  .q { font-size: clamp(24px, 2.8vw, 42px); line-height: 1.45; word-break: keep-all; }
+  .note { margin-top: 1em; font-size: 13px; opacity: .55; }
+
+  /* 맨 아래 장: 사인칭의 말 */
+  .cover { position: relative; background: #CFE6F5; color: var(--ink); text-align: center; padding: 56px 8% 50px; border-top: 1px solid var(--edge); }
+  .cover .script { font-family: "EB Garamond", var(--serif); font-style: italic; font-size: clamp(26px, 3vw, 44px); line-height: 1; }
+  .cover p { margin: 18px auto 0; max-width: 34em; font-size: clamp(15px, 1.3vw, 19px); line-height: 1.9; word-break: keep-all; }
+  .cover .sig { margin-top: 22px; font-family: var(--wide); font-size: 12px; letter-spacing: .4em; }
+
+  .foot { display: flex; justify-content: space-between; padding: 22px 5.6vw; font-size: 14px; color: var(--muted); margin-top: auto; }
+  .foot a:hover { color: var(--text); }
+
+  @media (max-width: 760px) {
+    :root { --tabw: 170px; --tabh: 42px; }
+    .tab .lab { font-size: 12px; white-space: normal; line-height: 1.3; }
+    .tab { padding: 0 22px; max-width: 86vw; }
+    .inner { grid-template-columns: 1fr; gap: 16px; padding: 30px 6% 26px; }
+    .layer.open .body { height: var(--open-m, 380px); }
+    .head .en { font-size: 9vw; } .head .ko { font-size: 6vw; }
+  }
+  @media (prefers-reduced-motion: reduce) { .body, .inner, .tab { transition: none; } }
+</style>
+<style id="button-cursor">
+  /* 마우스 커서: 분홍 단추 (누를 수 있는 곳에서는 조금 커진다) */
+  html, body { cursor: url("data:image/png;base64,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") 13 13, auto; }
+  a, button, [role="button"], label, summary, select, .spot, .spot *, .tg, .bk, .vol, .story, .chip, .env, .mark, .tab, .box, .knob, .lever, .room-in {
+    cursor: url("data:image/png;base64,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") 18 18, pointer !important; }
+  input[type="text"], textarea { cursor: text; }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="l"><span class="en">a question</span><span class="ko">물음표 시점으로</span></div>
+  <i class="rule" aria-hidden="true"></i>
+  <div class="r"><span class="en">makes a book</span><span class="ko">책을 만듭니다</span></div>
+</header>
+
+<main class="folders" id="folders" aria-label="사인칭의 책들"></main>
+
+<footer class="foot">
+  <a href="../">book is open door</a>
+  <span>4inching press, 합정</span>
+</footer>
+
+<script>
+  /* ─────────────────────────────────────────────
+     사인칭의 책과, 그 책을 관통하는 저자의 질문.
+     q: 인덱스 탭에 들어가는 문장형 물음표
+     ※ 모두 자리만 잡아 둔 예시 문장입니다. 저자의 질문으로 바꿔 주세요.
+     ───────────────────────────────────────────── */
+  const BOOKS = [
+    { q: '무엇이 더 말해져야 할까?', quote: '말해진 것보다 더 많이 말해져야 한다.', by: '도로테 죌레', title: '', author: '', year: '', status: '' },
+    { q: '두 번째 책의 질문이 이 자리에 들어갈까?', title: '두 번째 책', author: '저자 이름', year: '2027', status: '짓는 중' },
+    { q: '세 번째 책은 어떤 물음에서 시작될까?', title: '세 번째 책', author: '저자 이름', year: '2027', status: '짓는 중' },
+    { q: '네 번째 책은 무엇을 묻게 될까?', title: '네 번째 책', author: '저자 이름', year: '', status: '준비 중' },
+  ];
+  /* 장마다 또렷하게 다른 색: 민트, 하늘, 버터, 장밋빛, 라벤더, 살구 */
+  const COLORS = ['#CFE6F5'];   /* 한 가지 색 */
+  /* 탭 자리: 겹쳐도 서로 가리지 않게 엇갈려서 */
+  const XS = ['58%', '4%', '38%', '20%', '66%', '10%'];
+
+  /* 장 색의 보색 (같은 밝기, 반대편 색상) */
+  const complement = hex => {
+    let r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    let h = 0, s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+    if (d) h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h = (h * 60 + 180 + 360) % 360;
+    return `hsl(${h.toFixed(0)} ${(s * 100).toFixed(0)}% ${(l * 100).toFixed(0)}%)`;
+  };
+  const box = document.getElementById('folders');
+  const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  /* 사다리꼴 탭 모양 (250 × 50 기준) */
+  const tabSVG = `<svg viewBox="0 0 250 50" preserveAspectRatio="none" aria-hidden="true">
+    <path class="fill" d="M0 50 L17 7 Q20 0 28 0 H222 Q230 0 233 7 L250 50 Z"/>
+    <path class="edge" d="M0 50 L17 7 Q20 0 28 0 H222 Q230 0 233 7 L250 50"/></svg>`;
+
+  const layers = BOOKS.map((b, i) => {
+    const l = document.createElement('section');
+    l.className = 'layer' + (i === 0 ? ' open' : '');
+    l.style.setProperty('--c', COLORS[i % COLORS.length]);
+    l.style.setProperty('--tc', COLORS[i % COLORS.length]);
+    l.style.setProperty('--x', XS[i % XS.length]);
+    l.innerHTML = `
+      <button class="tab" aria-expanded="${i === 0}"><span class="lab">${esc(b.q)}</span></button>
+      <div class="body"><div class="inner${b.quote ? ' quote' : ''}">${b.quote ? `
+        <blockquote class="qt">“${esc(b.quote)}”<cite>${esc(b.by)}</cite></blockquote>` : ''}${b.title ? `
+        <div class="meta"><span class="dim">${esc(b.status)}</span><br><span class="t">${esc(b.title)}</span><br>${esc(b.author)}${b.year ? `, ${esc(b.year)}` : ''}</div>` : ''}
+      </div></div>`;
+    const tab = l.querySelector('.tab');
+    tab.setAttribute('aria-label', b.q);
+    tab.addEventListener('click', () => layers.forEach(x => {
+      x.classList.toggle('open', x === l);
+      x.querySelector('.tab').setAttribute('aria-expanded', x === l);
+    }));
+    box.appendChild(l);
+    return l;
+  });
+
+  // 탭 폭에 맞춰 사다리꼴을 다시 그린다 (옆선 기울기와 모서리 크기는 늘 같게)
+  function drawTabs() {
+    document.querySelectorAll('.tab').forEach(t => {
+      t.style.left = '';   // 원래 자리에서 시작해서
+      const w = Math.round(t.getBoundingClientRect().width), h = Math.round(t.getBoundingClientRect().height);
+      const pw = t.parentElement.clientWidth;
+      if (t.offsetLeft + w > pw - 8) t.style.left = Math.max(8, pw - w - 8) + 'px';   // 오른쪽 끝을 넘지 않게
+      const k = 17 * h / 50, r = 8;
+      const d = `M0 ${h} L${k} 7 Q${k + 3} 0 ${k + 11} 0 H${w - k - 11} Q${w - k - 3} 0 ${w - k} 7 L${w} ${h}`;
+      let svg = t.querySelector('svg');
+      if (!svg) { svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('aria-hidden', 'true'); t.prepend(svg); }
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      svg.innerHTML = `<path class="fill" d="${d} Z"/><path class="edge" d="${d}"/>`;
+    });
+  }
+  const cover = document.createElement('section');
+  cover.className = 'cover';
+  cover.innerHTML = `<div class="script">a question makes a book</div>
+    <p>사인칭은 하나의 물음표에서 책을 시작합니다. 저자가 오래 붙들고 있던 질문을 찾아, 그 질문이 첫 장부터 마지막 장까지 책 전체를 관통하도록 짓습니다.</p>
+    <div class="sig">4INCHING PRESS</div>`;
+  box.appendChild(cover);
+  drawTabs();
+  window.addEventListener('resize', drawTabs);
+  document.fonts && document.fonts.ready.then(drawTabs);
+</script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="description" content="책을 스무 겹으로 쪼개어 읽는 서가와, 책이 입은 옷.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="unstitch the book — 책을 해체하라">
+<meta property="og:description" content="책을 스무 겹으로 쪼개어 읽는 서가와, 책이 입은 옷.">
+<meta property="og:url" content="https://4inchingpress-create.github.io/portfolio/book/">
+<meta property="og:image" content="https://4inchingpress-create.github.io/portfolio/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>unstitch the book — 책을 해체하라</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond&family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: "SeMyungjo";
+    src: local("SM세명조"), local("SMSeMyungJo"), local("SMSeMyungJo-Regular"),
+         local("SM SeMyungJo Std"), local("SMSeMyungJoStd-Regular"),
+         url("../fonts/SMSeMyungJo.woff2") format("woff2");
+    font-display: swap;
+  }
+  :root {
+    --bg: #070303; --text: #EEEAE2; --muted: #8C877F; --ink: #111;
+    --serif: "SeMyungjo", "EB Garamond", "Nanum Myeongjo", serif;
+    --grotesk: "Helvetica Neue", Helvetica, Arial, "Apple SD Gothic Neo", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--serif); }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: inherit; }
+
+  .head { display: grid; grid-template-columns: auto 1fr auto; column-gap: 2.8vw; padding: max(18px, 2.6vw) 5.6vw 3vw; }
+  .head .en { display: block; font-size: min(6.2vw, 10vh); line-height: 1; letter-spacing: -.01em; }
+  .head .ko { display: block; margin-top: .9vw; font-size: min(4.2vw, 7vh); line-height: 1.05; letter-spacing: .02em; }
+  .head .r { text-align: right; }
+  .head .rule { height: 1.5px; background: var(--text); margin-top: min(3.8vw, 6.2vh); }
+
+  /* 머리글 아래 짧은 서문 */
+  .intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 4vw; padding: 0 5.6vw 3vw; align-items: start; }
+  .intro blockquote { font-size: clamp(18px, 1.7vw, 26px); line-height: 1.55; }
+  .intro blockquote cite { display: block; margin-top: .5em; font-style: normal; font-size: .62em; color: var(--muted); }
+  .intro p { font-size: clamp(14px, 1.1vw, 17px); line-height: 1.95; color: #D9D4CB; word-break: keep-all; }
+  .intro button { margin-top: 1em; font-size: 14px; color: var(--muted); border-bottom: 1px solid currentColor; }
+  .intro button:hover { color: var(--text); }
+
+  /* 서가: 4칸 × 5단, 얇은 검정 선 */
+  .shelf {
+    margin: 0 5.6vw;
+    background: #fff;
+    border: 1.5px solid #0B0808;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+  }
+  .cell {
+    aspect-ratio: 1 / 1.3;
+    border-right: 1px solid #0B0808; border-bottom: 1px solid #0B0808;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0 17%;
+  }
+  .cell:nth-child(4n) { border-right: 0; }
+  .cell:nth-last-child(-n+4) { border-bottom: 0; }
+  /* 책: 앞을 보고 선 표지 */
+  .bk {
+    width: 100%; aspect-ratio: .74;
+    background: var(--c); color: #111;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: 10% 6% 9%; text-align: center;
+    transition: transform .3s cubic-bezier(.3,.7,.2,1), opacity .3s;
+  }
+  .bk .t { font-size: clamp(17px, 1.75vw, 28px); line-height: 1.15; }
+  .bk .e { display: block; font-family: var(--grotesk); font-size: clamp(9px, .72vw, 12px); letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+  .bk .a { font-size: clamp(11px, .85vw, 14px); line-height: 1.35; word-break: keep-all; }
+  .bk:hover, .bk:focus-visible { transform: translateY(-8px); }
+  .bk:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+  .shelf:hover .bk:not(:hover) { opacity: .7; }
+
+  .foot { display: flex; justify-content: space-between; padding: 22px 5.6vw; font-size: 14px; color: var(--muted); }
+  .foot a:hover { color: var(--text); }
+
+  /* 펼치면: 일력 한 장처럼 */
+  .wrap { position: fixed; inset: 0; z-index: 50; background: rgba(7,3,3,.92); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; opacity: 0; pointer-events: none; transition: opacity .3s; padding: 3vh 4vw; }
+  .wrap.show { opacity: 1; pointer-events: auto; }
+  .page {
+    --rule: 2.35em;
+    width: min(92vw, 78vh, 680px); height: min(92vw, 78vh, 680px); overflow: hidden;
+    background: var(--pc); color: var(--ink);
+    display: grid; grid-template-columns: 9% 1fr;
+    box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    transform: translateY(12px); transition: transform .4s cubic-bezier(.3,.7,.2,1);
+    container-type: inline-size;
+    font-size: clamp(12px, 2.35cqw, 16px);
+  }
+  .wrap.show .page { transform: none; }
+  .page .side { border-right: 1.5px solid var(--ink); display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 3.4cqw 0; }
+  .page .side span { writing-mode: vertical-rl; font-family: var(--grotesk); font-weight: 700; font-size: 2.4cqw; letter-spacing: .06em; }
+  .page .side .pub { font-family: var(--serif); font-weight: 400; font-size: 2.6cqw; }
+  .page .main { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; overflow: hidden; }
+  .page .top { display: flex; justify-content: flex-end; align-items: flex-end; gap: 2.4cqw; padding: 3.6cqw 4cqw 1.4cqw; border-bottom: 1.5px solid var(--ink); }
+  .page .top .lab { font-family: var(--grotesk); font-weight: 700; font-size: 2.6cqw; letter-spacing: .06em; text-transform: uppercase; margin-bottom: .9cqw; }
+  .page .top .num { font-family: var(--grotesk); font-weight: 800; font-size: 11cqw; line-height: .8; letter-spacing: -.02em; }
+  /* 줄 공책: 줄 간격 = 글줄 간격 */
+  .page .lines {
+    overflow-y: auto; scrollbar-width: thin;
+    padding: 0 4cqw 0 2.6cqw;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--rule) - 1.5px), var(--ink) calc(var(--rule) - 1.5px), var(--ink) var(--rule));
+    background-attachment: local;
+    line-height: var(--rule);
+    word-break: keep-all;
+  }
+  .page .lines .tt { font-weight: 400; }
+  .page .lines .tt b { font-size: 1.25em; font-weight: 400; }
+  .page .lines .qq { color: #333; }
+  .page .lines p { margin: 0; }
+  .page .bot { display: flex; justify-content: space-between; align-items: flex-end; padding: 1.6cqw 4cqw 3cqw 2.6cqw; border-top: 1.5px solid var(--ink); font-size: .9em; line-height: 1.5; }
+  .page .bot .r { text-align: right; }
+  .controls { display: flex; gap: 26px; font-size: 15px; }
+  .controls button:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+  @media (max-width: 860px) {
+    .intro { grid-template-columns: 1fr; }
+    .shelf { grid-template-columns: repeat(2, 1fr); margin: 0 4vw; }
+    .cell:nth-child(4n) { border-right: 1px solid #0B0808; }
+    .cell:nth-child(2n) { border-right: 0; }
+    .cell:nth-last-child(-n+4) { border-bottom: 1px solid #0B0808; }
+    .cell:nth-last-child(-n+2) { border-bottom: 0; }
+    .bk .t { font-size: 5.4vw; } .bk .e { font-size: 2.4vw; } .bk .a { font-size: 3vw; }
+    .head .en { font-size: 9vw; } .head .ko { font-size: 6vw; }
+  }
+  @media (prefers-reduced-motion: reduce) { .wrap, .page, .bk { transition: none; } }
+
+  /* ───── 책이 입은 옷: 봉에 걸린 행택 ───── */
+  .cob { margin: 10vh 5.6vw 4vh; }
+  .cob-head { display: flex; align-items: baseline; gap: 18px; padding-bottom: 14px; border-bottom: 1.5px solid var(--text); }
+  .cob-head h2 { font-weight: 400; font-size: clamp(30px, 3.4vw, 52px); line-height: 1; }
+  .cob-head span { font-family: var(--grotesk); font-size: 13px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
+  .cob-lead { margin-top: 18px; max-width: 40em; font-size: 16px; line-height: 1.9; color: #D9D4CB; word-break: keep-all; }
+  .rack { position: relative; margin-top: 46px; padding: 20px 0 44px; background: #F3F2EF; }
+  /* 한 장씩: 가로로 넘기는 행택 */
+  .tags { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .tags::-webkit-scrollbar { display: none; }
+  .tags .slide { flex: 0 0 100%; display: flex; justify-content: center; scroll-snap-align: center; padding: 44px 0 48px; }  /* 뒤집힐 때 위아래가 잘리지 않을 여유 */
+  .tnav { display: flex; justify-content: center; align-items: baseline; gap: 40px; margin-top: 26px; color: #111; font-family: var(--grotesk); font-weight: 300; font-size: clamp(20px, 1.9vw, 28px); letter-spacing: .06em; text-transform: lowercase; }
+  .tnav button { font-weight: 300; color: #B8B2A8; font-variant-numeric: tabular-nums; transition: color .3s; }
+  .tnav button:hover { color: #6E6860; }
+  .tnav button[aria-current="true"] { color: #111; }
+  .tg { position: relative; width: clamp(240px, 24vw, 330px); aspect-ratio: 725 / 1222; perspective: 2600px; cursor: pointer; }
+  .tg .in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 1.6s cubic-bezier(.45,.05,.25,1); }
+  .tg:hover .in, .tg:focus-visible .in { transform: rotateY(180deg); }
+  .tg .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 10px 22px rgba(0,0,0,.14); }
+  .tg .front { background: #000; color: #fff; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 12% 13%; font-family: var(--grotesk); text-align: left; }
+  .tg .front::before, .tg .back::before { content: ""; position: absolute; left: 50%; top: 7%; width: 9%; aspect-ratio: 1; border-radius: 50%; background: #F3F2EF; transform: translateX(-50%); z-index: 2; }
+  .tg .front dl { display: grid; grid-template-columns: auto 1fr; column-gap: 14%; row-gap: 8px; font-size: clamp(12px, 1.1vw, 15px); line-height: 1.35; }
+  .tg .front dt { font-weight: 500; } .tg .front dd { font-weight: 600; word-break: keep-all; }
+  .tg .sw { display: inline-block; width: 1.15em; height: 1.15em; margin-right: 3px; vertical-align: -.2em; border: 1px solid #fff; }
+  .tg .back { transform: rotateY(180deg); background: #111 center / cover no-repeat; }
+  .tg:focus-visible { outline: none; } .tg:focus-visible .face { outline: 2px solid #111; outline-offset: 4px; }
+  /* 행택을 열면: 왼쪽 표지, 오른쪽 읽기 */
+  .cob-wrap { position: fixed; inset: 0; z-index: 60; background: rgba(7,3,3,.92); display: flex; align-items: center; justify-content: center; padding: 3vh 4vw; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  .cob-wrap.show { opacity: 1; pointer-events: auto; }
+  .cob-sheet { width: min(1080px, 100%); max-height: 88vh; overflow: auto; background: #F3F2EF; color: #111; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); transform: translateY(12px); transition: transform .4s cubic-bezier(.3,.7,.2,1); }
+  .cob-wrap.show .cob-sheet { transform: none; }
+  .cob-sheet .pic { background: #E9E7E2; display: flex; align-items: center; justify-content: center; padding: 6% 8%; position: sticky; top: 0; align-self: start; height: min(88vh, 100%); max-height: 88vh; }
+  .cob-sheet .pic img { width: 100%; max-width: 380px; display: block; box-shadow: 0 14px 28px rgba(0,0,0,.18); }
+  .cob-sheet .txt { padding: clamp(24px, 3.4vw, 48px); font-family: var(--grotesk); }
+  .cob-sheet .bar { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; padding-bottom: 12px; border-bottom: 1px solid #111; }
+  .cob-sheet .bar button { letter-spacing: .1em; border-bottom: 1px solid currentColor; }
+  .cob-sheet h3 { margin-top: 26px; font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 2.8vw, 40px); line-height: 1.25; }
+  .cob-sheet .meta { margin-top: 18px; display: grid; grid-template-columns: 90px 1fr; row-gap: 6px; font-size: 14px; }
+  .cob-sheet .meta dt { font-weight: 500; color: #555; }
+  .cob-sheet .sw { display: inline-block; width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px; border: 1px solid #111; }
+  .cob-sheet .story { margin-top: 26px; padding-top: 18px; border-top: 1px solid #111; font-family: var(--serif); font-size: 16px; line-height: 1.95; word-break: keep-all; }
+  .cob-sheet blockquote { margin-top: 20px; padding-left: 16px; border-left: 1.5px solid #111; font-family: var(--serif); font-size: 15px; line-height: 1.85; color: #333; word-break: keep-all; }
+  .cob-sheet blockquote cite { display: block; margin-top: 6px; font-style: normal; font-family: var(--grotesk); font-size: 12.5px; color: #666; }
+  .cob-sheet table { margin-top: 24px; width: 100%; border-collapse: collapse; font-size: 14px; }
+  .cob-sheet th, .cob-sheet td { text-align: left; padding: 8px 0; border-bottom: 1px solid #111; font-weight: 500; } .cob-sheet th { width: 90px; }
+  .cob-sheet .spread { margin-top: 22px; width: 100%; display: block; border: 1px solid #ccc; }
+  .cob-sheet .nav { margin-top: 26px; display: flex; gap: 22px; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
+  .cob-sheet .nav button { border-bottom: 1px solid currentColor; }
+  @media (max-width: 860px) { .cob-sheet { grid-template-columns: 1fr; } .cob-sheet .pic { position: static; height: auto; } .cob-sheet .pic img { max-width: 260px; } }
+  @media (prefers-reduced-motion: reduce) { .tg .in, .cob-wrap, .cob-sheet { transition: none; } }
+</style>
+<style id="button-cursor">
+  /* 마우스 커서: 분홍 단추 (누를 수 있는 곳에서는 조금 커진다) */
+  html, body { cursor: url("data:image/png;base64,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") 13 13, auto; }
+  a, button, [role="button"], label, summary, select, .spot, .spot *, .tg, .bk, .vol, .story, .chip, .env, .mark, .tab, .box, .knob, .lever, .room-in {
+    cursor: url("data:image/png;base64,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") 18 18, pointer !important; }
+  input[type="text"], textarea { cursor: text; }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="l"><span class="en">unstitch</span><span class="ko">책을</span></div>
+  <i class="rule" aria-hidden="true"></i>
+  <div class="r"><span class="en">the book</span><span class="ko">해체하라</span></div>
+</header>
+
+<section class="intro" id="intro"></section>
+<main class="shelf" id="grid" aria-label="책을 해체한 스무 겹"></main>
+
+
+
+<!-- 책이 입은 옷: 서가 아래, 봉에 걸린 행택들 -->
+<section class="cob" aria-labelledby="cobTitle">
+  <div class="cob-head"><h2 id="cobTitle">책이 입은 옷</h2><span>clothing of book</span></div>
+  <p class="cob-lead">위에서 쪼갠 겹들이 실제 한 권의 책에서는 어떻게 입혀졌을까요. 다른 디자이너들이 지은 표지에 한 권씩 행택을 달아 들여다봅니다. 행택에 손을 올리면 뒤집히고, 누르면 열립니다.</p>
+  <div class="rack"><div class="tags" id="tags"></div>
+    <div class="tnav" id="tNav" aria-label="행택 고르기"></div></div>
+</section>
+
+<div class="cob-wrap" id="cobWrap" role="dialog" aria-modal="true" aria-hidden="true">
+  <article class="cob-sheet" id="cobSheet"></article>
+</div>
+
+<footer class="foot">
+  <a href="../">book is open door</a>
+  <span>4inching press, book design</span>
+</footer>
+
+<div class="wrap" id="wrap" role="dialog" aria-modal="true" aria-hidden="true">
+  <article class="page" id="page"></article>
+  <div class="controls"><button id="pv">prev</button><button id="nx">next</button><button id="cl">close</button></div>
+</div>
+
+<script>
+  const ALL = [{"t": "책 쪼개기", "en": "unstitch", "q": "자기 자신을 여러 겹으로 만드는 것이 필요하다.", "qa": "페르난도 페소아", "p": ["한 권의 책을 쪼개면 여러 개의 겹을 발견하게 된다. 이 겹들은 저마다 다른 결을 갖고, 서로 다른 시간과 공간을 품은 채 자리한다. 우리는 흔히 책을 하나의 완성된 단일체로 바라보지만, 그것을 수평적으로 펼치면 여러 겹들의 관계가 드러난다.", "목차와 페이지 번호, 책등과 가름끈, 여백과 면지, 종이와 풀, 인쇄와 가공, 시간과 흐름…", "책의 모든 요소는 풀의 뿌리처럼 복잡하게 얽힌 채 뻗어나가며 연결망을 이룬다. 그 흐름을 따라가다 보면 지나쳤던 것들이 다시 빛을 얻고, 새로운 관계 맺는 장으로써 책이 펼쳐진다."]}, {"t": "책등", "en": "spine", "sub": "서가에 놓인 책에게 등을 보이지 말라", "q": "글은 누워 있고 책은 서 있다", "qa": "", "p": ["척추는 몸을 가로지르며, 기다란 선으로 우리 몸을 이어준다. 마찬가지로 책등도 ‘spine’이라 불리며 글의 몸을 세운다.", "고대 두루마리 시대에는 긴 종이를 돌돌 말아 보관해 ‘등’이라는 개념이 없었다. 대신 두루마리 끝에 제목을 매달아 표시하곤 했는데, 이후 책의 형태의 시초인 ‘코덱스’가 등장하면서 여러 장의 종이를 한쪽에 묶게 되었다. 이렇게 묶인 부분이 책의 척추, 책등이다.", "서양에서 오래된 책을 두고 “A broken spine tells a story”라 말한다. 부서진 책등은 그 책이 얼마나 사랑받았는지를 보여준다. 책등의 주름처럼 굽은 등을 가진 할머니 역시 오래된 책처럼 사랑스럽다.", "서가에 꽂힌 책은 오랜 기다림을 시작한다."]}, {"t": "판형", "en": "format", "q": "형태는 내용을 앞서 말한다.", "qa": "마셜 매클루언", "p": ["책은 펼쳐지기 전에 먼저 손에 쥐어진다. 책의 크기에 따라 책의 성격도 바뀐다. 작은 판형은 주머니 속으로 들어가 은밀함을 택하고, 큰 판형은 탁자 위에 펼쳐지며 집중을 요구한다. 정방형은 응시를 만들고, 가로형은 흐름을 만들고, 세로형은 하강을 만든다.", "판형이란 결국, 책이 세계를 어떻게 받아들이고, 자신을 어떻게 건네고, 독자와 어떤 거리에서 만나고 싶은지에 대한 선택이다.", "텍스트의 의미는 그 안에 담기지만, 읽기라는 사건은 이 외피의 비율에서 이미 시작된다. 판형은 책의 가장 겉에 있으나, 책의 가장 깊은 층위를 결정한다. 모든 형태는 이미 하나의 사유다."]}, {"t": "면지", "en": "endpaper", "sub": "침묵의 세계 — 책이 열리기 전, 가장 조용한 장면", "q": "침묵은 모든 말의 고향이다.", "qa": "막스 피카르트", "p": ["책을 펼치고 가장 먼저 만나는 것은 글이 아니라 침묵이다. 면지는 이야기의 시작도, 본문의 일부도 아니지만, 책의 세계로 들어가기 전 몸과 마음의 기압을 조정하는 공간처럼 존재한다. 그 침묵은 비어 있음이 아니라, 문학이 시작되기 직전의 미세한 떨림이다. 연극으로 치면 조명이 막 켜지기 전의 어둠, 음악으로 치면 첫 음이 울리기 직전의 공기.", "초기 코덱스 시대의 장인들은 책을 보호하기 위해 덧대는 종이를 단순한 덮개로 보지 않았다. 책이 외부 세계와 직접 부딪히지 않도록, 그리고 책이 가진 사유의 깊이가 갑작스레 노출되지 않도록 완충지대를 마련하는 일이라 여겼다.", "면지는 본문과 표지 사이의 경계이면서, 단절이 아니라 연결의 기술을 품은 겹이다. 독자는 면지를 넘기며 자신의 시간에서 책의 시간으로 이행한다. 면지는 책 속에서 가장 얇고 조용한 층이지만, 그 얇음 속에서 책의 세계는 처음으로 문을 갖는다. 말은 언제나 침묵에서 태어난다. 면지는 그 침묵을 잊지 않게 하는, 책에서 가장 근원적인 공간이다.", "책은 고체 상태의 침묵이다. — 키냐르"]}, {"t": "페이지", "en": "page", "sub": "시간의 골짜기", "q": "모든 여정에는 이정표가 필요하다.", "qa": "이탈로 칼비노", "p": ["책 속에선 길을 잃기 쉽다. 페이지 번호는 책 속의 좌표이자, 시간의 흐름을 따라 닿는 골짜기다. 지금 어디에 있는지 알려주는 지도 위에 찍힌 조용한 점. 시작과 끝에선 언제나 모습을 감춘다.", "“지도 위 조용한 발자국 하나”", "중력처럼 닻을 내리는 번호들을 따라 흐르다 보면, 어느새 자신만의 골짜기에 닿아 있다."]}, {"t": "여백", "en": "margin", "sub": "빈자리", "q": "", "qa": "", "p": ["비어야 채울 수 있다.", "여백은 텍스트의 바다에서 모래사장처럼 쉬어가는 자리이다. 조용히 숨을 고르는 공간, 잠시 풍경을 관망하는 자리, 침묵이 머무는 곳.", "햇볕에 글을 말리고, 파도가 소리를 들으며 잠시 멈춘다. 그렇게 비운 자리로 이야기가 밀려 들어온다."]}, {"t": "날개", "en": "flap", "q": "사랑을 하면 날개가 돋아난다.", "qa": "이상, 『날개』", "p": ["날개는 책의 숨겨진 공간이다.", "책을 펼치면 양쪽으로 접힌 종이가 마치 새의 날개처럼 펼쳐진다. 앞표지와 연결된 앞날개, 뒤표지와 연결된 뒷날개. 책이 닫히면 날개는 다시 모습을 감추고, 펼쳐질 때만 모습을 드러낸다."]}, {"t": "띠지", "en": "belly band", "q": "첫인상은 옷깃을 여미는 순간에 결정된다.", "qa": "일본 속담", "p": ["띠지는 책의 허리를 감싸는 종이 띠다.", "일본어로 ‘오비’라 부르는 이 얇은 종이는 기모노의 허리띠에서 이름을 빌려왔다. 기모노를 입을 때 오비가 옷매를 잡아주듯, 책띠는 책을 잡아준다. 띠지가 본격적으로 등장한 것은 20세기 초 일본의 출판 문화에서다. 서점 진열대에서 독자의 시선을 사로잡기 위해, 출판사들은 책 위에 짧고 강렬한 문구를 두르기 시작했다. “올해의 책”, “100만 부 돌파”, 유명인의 추천사. 띠지는 수많은 책들 사이에서 “나를 봐달라”고 손을 흔드는 작은 외침이 되었다.", "하지만 띠지의 운명은 묘하다. 책을 산 독자 중 누군가는 집에 오자마자 띠지를 벗겨 버린다. 반대로 누군가는 띠지를 책갈피처럼 간직한다. 띠지는 언젠가 떨어져 나갈 운명을 타고난, 책에서 가장 덧없는 겹이다. 그러나 그 덧없음 속에서 책은 처음으로 누군가에게 선택받는다."]}, {"t": "자켓", "en": "jacket", "q": "옷은 몸을 보호하지만, 동시에 세계와 만나는 첫 표면이다.", "qa": "롤랑 바르트", "p": ["책이 추울 때, 입는 옷.", "자켓은 책의 표지를 감싸는 한 겹의 종이다. 벗겨낼 수 있고, 접을 수 있고, 잃어버릴 수도 있다. 그것은 책의 일부이면서 동시에 책과 분리될 수 있는 유일한 겹이다.", "자켓을 벗기면 그 아래 또 다른 표지가 나타난다. 때로는 같은 디자인이, 때로는 전혀 다른 얼굴이 숨어 있다. 자켓은 책이 두 개의 얼굴을 가질 수 있게 해주는 이중의 껍질이다. 공적인 얼굴과 사적인 얼굴, 서점에서의 모습과 서재에서의 모습.", "어떤 독자는 책을 읽는 동안 자켓을 벗겨 책갈피로 쓴다. 자켓의 안쪽 날개가 딱 한 페이지를 표시하기에 적당한 크기이기 때문이다. 자켓은 그렇게 책을 감싸던 옷에서, 책 속을 떠도는 표지가 된다.", "자켓은 책이 세계와 만날 때 입는 옷이자, 독자가 책과 친밀해질 때 벗는 옷이다."]}, {"t": "판권지", "en": "colophon", "q": "모든 책에는 보이지 않는 협력자들이 있다.", "qa": "움베르토 에코", "p": ["판권지는 책의 주민등록표다.", "중세 필사사들이 마지막 장에 “신께 감사하며, 지친 손가락이여 쉬라”고 적던 전통을 이어받아, 인쇄업자들은 자신의 업적을 기록하기 시작했다. 오늘날 판권지는 책의 앞쪽, 제목 페이지 뒷면에 자리 잡았다.", "우리는 매번 그 페이지를 건너뛴다. 작은 글씨로 빼곡히 적힌 ISBN과 출판사 정보, 인쇄소 이름과 저작권 표시. 이야기가 시작되기 전의 그 공간. 판권지는 마치 무대 뒤 스태프 명단처럼 조용히 자리한다.", "하지만 이 작은 페이지에는 한 권의 책이 세상에 나오기까지 거쳐온 모든 것이 새겨져 있다. 저자의 이름 뒤에는 편집자가, 그 뒤에는 디자이너가, 교정자가, 인쇄소 직원들이 서 있다. 초판 1쇄가 찍힌 날짜는 이 책이 세상에 첫발을 내딛은 순간을 기록하고, 3쇄, 5쇄로 이어지는 숫자는 얼마나 많은 사람들이 이 책을 손에 들었는지를 말해준다.", "ISBN은 책의 지문이다. 전 세계 어디서든 이 번호만으로 책을 찾을 수 있다. 판권지는 단순한 법적 정보가 아니라, 한 권의 책이 세상에 나오기까지 거쳐온 모든 손길의 흔적이다."]}, {"t": "종이", "en": "paper", "q": "인정하기 껄끄러울 수도 있으나, 당신이 좋아하는 그 어떤 예술작품의 창작자도 자연이 지닌 완벽함을 갖지는 못한다.", "qa": "레오나르도 다 빈치", "p": ["책은 나무를 모방한다.", "종이는 나무였다. 베이고 갈리고 짓눌려 펄프가 되고, 물과 섞여 액체가 되었다가, 다시 얇은 막으로 펼쳐져 고체가 된다. 그 변화의 과정을 거쳐 종이는 나무의 두 번째 생을 산다.", "종이를 만져보면 결을 느낄 수 있다. 나무의 결이 종이 위에 남아 흐른다. 횡목과 종목, 종이는 방향을 가진 물질이다. 그 방향을 따라 접히고, 찢어지고, 책의 한 페이지가 된다.", "책의 장르에 따라 종이가 결정된다. 소설은 부드러운 종이를, 사진집은 두툼한 종이를, 시집은 거친 종이를 택한다. 종이는 단순히 글자를 담는 표면이 아니라, 책의 내용과 호흡을 함께 만들어내는 물질이다.", "우리는 책을 읽을 때 종이를 넘긴다. 손끝으로 나무의 결을 따라가고, 한 페이지에서 다음 페이지로 넘어가며 나무를 매만진다. 책은 나무를 닮았고, 우리는 책을 읽으며 여전히 숲을 걷는다."]}, {"t": "서체", "en": "typeface", "q": "글자는 생각의 형태다.", "qa": "에릭 길", "p": ["서체는 텍스트가 독자에게 다가가는 방식이다.", "같은 문장이라도 명조체로 쓰면 차분해지고, 고딕체로 쓰면 단단해진다. 서체는 단순히 글자의 모양이 아니라, 글이 독자에게 말을 건네는 태도를 결정한다. 소설은 명조체를 택해 시간의 흐름을 따라가고, 실용서는 고딕체를 택해 정보를 명확히 전달한다.", "서체는 가독성을 좌우한다. 눈에 피로감을 덜어주는 서체가 있고, 오래 읽으면 눈이 아픈 서체가 있다. 한국 단행본에서 가장 많이 사용되는 서체는 명조 계열이다. 수백 페이지를 넘기는 동안 독자의 눈이 편안하게 글자를 따라갈 수 있도록.", "서체는 새하얀 눈 위에 뿌려진 과자 조각 같다. 하나하나의 글자는 묵직한 돌처럼 종이 위에 놓이고, 독자는 그 조각들을 따라가다 보면 어느새 이야기가 끝나는 곳에 도착한다."]}, {"t": "책과 시간", "en": "time", "q": "시간은 중력이 클수록 빠르게 흐른다.", "qa": "아인슈타인", "p": ["어떤 공간에 있느냐에 따라 시간은 다르게 흐른다. 산 위에 있을 때와 평지에 있을 때, 시간의 속도는 다르다. 책을 읽을 때도 마찬가지다.", "좋은 책을 읽으면 시간이 사라진다. 좋은 문장을 발견할 때면 마음이 빨라진다. 종이를 넘기는 손이 빨라지고, 한 장 한 장 넘기는 게 아깝게 느껴진다. 책 속의 시간은 말의 다리처럼 다그닥 다그닥 달린다.", "그럴 때면 숨을 한 번 내쉬고, 괜히 창밖을 내다본다. 좋은 문장을 마주하면 잠시 호흡을 가다듬고, 일부러 멈춘다. 책 속에서 시간은 균일하게 흐르지 않는다. 어떤 페이지는 천천히 흘러가고, 어떤 페이지는 눈 깜짝할 사이에 지나간다.", "책은 독자에게 고유한 시간을 선물한다. 현실의 시간에서 벗어나, 책만의 중력 안으로 들어가는 것. 독자는 책을 읽으며 시간의 다리를 감각한다. 느려지고, 빨라지고, 멈추고, 다시 흐르는 시간을.", "책을 덮으면 다시 현실의 시간으로 돌아온다. 하지만 책 속에서 보낸 그 시간은, 결코 사라지지 않는다."]}, {"t": "가름끈", "en": "ribbon", "q": "모든 중단은 다시 시작하기 위한 것이다.", "qa": "폴 발레리", "p": ["가름끈은 책 속에서 유일하게 움직이는 것이다.", "책등에 붙어 있던 가는 끈은 독자가 멈춘 곳에 내려앉는다. 어제 읽다 멈춘 페이지, 오늘 다시 시작할 페이지. 가름끈은 독자의 시간을 기억한다.", "책갈피는 책 밖에서 온 것이지만, 가름끈은 책의 일부다. 책이 태어날 때부터 붙어 있던, 책 자신의 손가락. 독자는 그 끈을 잡아당겨 자신이 멈춘 곳을 표시하고, 다시 책을 펼칠 때 그 끈을 따라 돌아온다.", "가름끈은 책에게 허락된 유일한 움직임이다. 책의 모든 요소가 고정되어 있을 때, 가름끈만은 독자의 손에 따라 이 페이지에서 저 페이지로 옮겨 다닌다. 그것은 책이 완결된 물체가 아니라, 여전히 읽히고 있는 살아있는 사건임을 증명한다.", "가름끈이 없는 책은 독자에게 말한다. 한 번에 다 읽으라고. 하지만 가름끈이 있는 책은 안다. 독자가 언젠가 멈출 것을, 그리고 다시 돌아올 것을."]}, {"t": "서문", "en": "preface", "q": "모든 시작에는 문턱이 있다.", "qa": "발터 벤야민", "p": ["서문은 책의 현관이다.", "본문이 시작되기 전, 독자는 서문이라는 공간을 지나간다. 저자가 이 책을 왜 썼는지, 어떤 마음으로 썼는지, 독자에게 무엇을 기대하는지. 서문은 책의 얼굴이 아니라 목소리다.", "서문은 본문과 다른 시간에서 쓰인다. 때로는 책을 다 쓴 뒤에, 때로는 책을 쓰기 시작하기 전에. 그래서 서문에는 본문에 없는 것들이 담긴다. 망설임, 다짐, 혹은 변명. 저자는 서문에서 독자와 처음으로 마주 앉는다.", "어떤 독자는 서문을 건너뛴다. 본문으로 곧장 들어가고 싶어서. 반대로 어떤 독자는 서문을 가장 천천히 읽는다. 책 전체의 분위기를 미리 가늠하고 싶어서.", "서문은 책의 일부이면서 책 밖에 있다. 이야기가 시작되기 전의 마지막 준비, 독자가 책의 세계로 들어가기 전 잠시 숨을 고르는 공간. 서문을 지나면, 비로소 책이 시작된다."]}, {"t": "무게", "en": "weight", "q": "물건의 무게는 그것이 세계에 존재한다는 증거다.", "qa": "장 보드리야르", "p": ["책은 손에 쥐어질 때 비로소 실재한다.", "화면 속 텍스트는 가볍다. 스크롤을 내리면 끝없이 이어지고, 손가락 하나로 수천 페이지를 넘긴다. 하지만 책은 다르다. 책은 무게를 가진다. 손에 들면 그 무게만큼 실재가 느껴진다.", "얇은 시집은 한 손에 가볍게 쥐어지고, 두꺼운 장편소설은 무릎 위에 올려놓아야 한다. 사전은 책상 위에서만 펼쳐지고, 문고본은 주머니 속에 들어간다. 책의 무게는 읽는 방식을 결정한다.", "중세 수도원의 사서들은 귀한 책을 쇠사슬로 책상에 묶어두었다. 그 무게는 단순히 종이와 표지의 합이 아니라, 지식 자체의 무게였다. 책이 무거울수록 소중히 다루어졌고, 쉽게 옮겨지지 않았다.", "책을 읽다 보면 어느새 팔이 저려온다. 무게가 느껴진다. 그때 독자는 안다. 자신이 지금 실재하는 물건을 쥐고 있다는 것을, 그 물건이 중력을 가지고 세계에 존재한다는 것을.", "책의 무게는 책이 여전히 물질임을 상기시킨다."]}, {"t": "속도", "en": "pace", "q": "문장은 호흡이다.", "qa": "롤랑 바르트", "p": ["책은 저마다 다른 속도로 읽힌다.", "마침표는 멈춤이다. 쉼표는 잠깐의 숨고르기다. 세미콜론은 완전히 끝나지 않은 채로 이어지는 긴 호흡이다. 독자는 문장부호를 따라 숨을 쉰다. 짧은 문장이 이어지면 호흡이 빨라지고, 긴 문장이 펼쳐지면 숨을 깊이 들이마신다.", "문장부호는 시간의 분절이다. 점 하나가 찍힐 때마다 사유가 멈추고, 쉼표가 놓일 때마다 생각이 이어진다. 물음표는 독자를 붙들고, 느낌표는 앞으로 밀어낸다. 줄표는 생각의 속도를 늦추며 다른 층위로 빠져든다.", "책의 속도는 저자가 호흡을 나누는 방식이다. 어떤 문장은 한 번에 달려 나가고, 어떤 문장은 여러 번 멈춰 서며 나아간다. 독자는 그 리듬 속에서 자신의 호흡을 책의 호흡에 맞춘다.", "책을 읽는다는 것은 결국 저자의 호흡을 따라 숨 쉬는 일이다. 점과 쉼표, 물음표와 느낌표를 따라, 독자는 책이 허락하는 속도로만 나아갈 수 있다.", "속도는 문장부호가 새긴 시간의 결이다."]}, {"t": "표지", "en": "cover", "q": "얼굴은 영혼의 거울이다.", "qa": "키케로", "p": ["표지는 책의 얼굴이다.", "책이 세계와 처음 마주하는 표면. 제목과 저자의 이름, 색과 이미지가 배치된 그 한 장의 면. 우리는 책을 펼치기 전에 먼저 표지를 본다. 그 첫 인상이 책 전체의 분위기를 예감하게 한다.", "표지는 안과 밖을 가르는 경계다. 바깥 세계와 책의 세계를 나누는 얇은 막. 표지를 넘기는 순간, 독자는 현실에서 이야기의 시간으로 건너간다. 표지는 문턱이자 문이다.", "중세의 책들은 가죽과 금박으로 표지를 장식했다. 표지는 단순히 본문을 보호하는 것이 아니라, 그 안에 담긴 지식의 가치를 외부에 드러내는 방식이었다. 화려한 표지는 귀한 내용을, 소박한 표지는 검소한 사유를 담았다.", "오늘날 표지는 책의 첫 번째 언어가 되었다. 색과 형태, 서체와 이미지로 책은 자신이 어떤 이야기를 품고 있는지 말없이 전한다. 독자는 표지를 보며 이 책이 자신을 부르는지 판단한다.", "표지는 책의 가장 바깥이지만, 책을 선택하게 만드는 가장 안쪽의 힘이다."]}, {"t": "제본", "en": "binding", "q": "결합은 분리보다 어렵다.", "qa": "레오나르도 다 빈치", "p": ["제본은 흩어진 종이를 하나로 묶는 기술이다.", "책이 책이 되는 순간은 인쇄가 끝난 뒤가 아니라, 낱장의 종이들이 하나로 엮일 때다. 실로 꿰매거나, 풀로 붙이거나, 철사로 고정하거나. 제본은 종이들이 흩어지지 않도록, 페이지가 순서를 잃지 않도록, 책을 하나의 몸으로 만든다.", "제본 방식에 따라 책의 성격이 달라진다. 사철제본은 실로 종이를 꿰매 책등이 유연하게 움직인다. 책은 180도로 펼쳐지며 독자를 맞이한다. 양장제본은 표지에 딱딱한 보드지를 대고 천이나 가죽으로 감싼다. 무게감이 있고, 오래 보관할 수 있다. 무선제본은 풀로 페이지를 붙여 간편하지만, 책등이 굳게 서 있어 완전히 펼쳐지지 않는다.", "중세 수도원의 제본사들은 책을 묶는 일을 기도와 같은 것으로 여겼다. 한 권의 책을 완성하는 데 수개월이 걸렸고, 마지막 매듭을 짓는 순간에는 “이 책이 영원히 흩어지지 않기를”이라는 기원을 새겨 넣었다. 실제로 중세의 잘 만들어진 책들은 수백 년이 지난 지금도 여전히 단단하게 묶여 있다.", "제본은 책에서 가장 눈에 띄지 않는 기술이다. 하지만 제본이 무너지면 책은 더 이상 책이 아니다. 제본은 책을 하나로 묶는 보이지 않는 중력이다."]}, {"t": "냄새", "en": "scent", "q": "냄새는 기억의 가장 깊은 층에 닿는다.", "qa": "마르셀 프루스트", "p": ["책은 고유한 냄새를 가진다.", "새 책을 펼치면 잉크와 종이, 풀의 냄새가 올라온다. 인쇄소에서 막 나온 책의 냄새는 날카롭고 선명하다. 독자는 그 냄새를 맡으며 아무도 읽지 않은 책, 자신이 처음 펼치는 페이지를 감각한다.", "오래된 책은 다른 냄새를 품는다. 세월이 종이 속으로 스며들고, 먼지와 습기, 햇빛이 켜켜이 쌓인 냄새. 고서점에 들어서면 수십 년, 수백 년의 시간이 공기 중에 떠다닌다. 그 냄새는 달콤하면서도 쓰고, 낡으면서도 깊다.", "책의 냄새는 보관 방식에 따라 달라진다. 햇볕이 드는 서재의 책은 마른 나무 냄새를, 지하 창고의 책은 곰팡이 냄새를 품는다. 담배를 피우던 사람의 서재에서 온 책은 연기 냄새가 배어 있고, 커피를 마시며 읽던 책은 희미한 원두 향을 간직한다.", "책의 냄새는 보이지 않는 역사다. 이 책이 어디에 있었는지, 누가 읽었는지, 얼마나 오래되었는지. 독자는 책을 코에 가까이 대고 깊이 들이마신다. 냄새는 눈으로 읽을 수 없는 것을 말해준다.", "책의 냄새는 시간이 종이에 남긴 흔적이다."]}, {"t": "감각", "en": "senses", "q": "우리는 세계를 생각하기 전에 먼저 감각한다.", "qa": "모리스 메를로퐁티", "p": ["책은 읽기 전에 먼저 만져진다.", "손에 쥐어지는 무게, 표지의 질감, 종이를 넘길 때 손끝에 전해지는 미세한 저항. 책은 눈으로만 읽히는 것이 아니라, 손과 코, 귀로 경험된다. 독자는 책을 감각하며 읽는다.", "종이를 넘기면 소리가 난다. 바스락, 혹은 부드럽게 스치는 소리. 새 책의 페이지는 뻣뻣하게 소리 내고, 오래된 책의 페이지는 부드럽게 넘어간다. 독자는 그 소리를 들으며 자신이 얼마나 앞으로 나아갔는지, 얼마나 남았는지를 어렴풋이 감지한다.", "책의 무게는 손에서 팔로, 팔에서 몸으로 전해진다. 두꺼운 책을 오래 들고 있으면 팔이 저려온다. 그 무게는 책이 물질임을, 세계에 실재하는 물건임을 상기시킨다. 가벼운 책은 몸의 부담을 덜어주고, 무거운 책은 독자에게 자세를 바꾸라고 요청한다.", "책을 읽는다는 것은 눈으로 글자를 따라가는 것만이 아니다. 손으로 만지고, 귀로 듣고, 코로 맡으며, 몸 전체로 책의 존재를 받아들이는 일이다.", "책은 감각의 총체다."]}];
+  const INTRO = ALL[0];
+  const C = ALL.slice(1);
+
+  /* 레퍼런스의 색감: 카키, 주황, 라벤더 그레이, 라임, 적갈색, 파랑, 그리고 쉬어 가는 밝은 회색 */
+  const PALETTE = [
+    '#BEBBA4', '#FF4A1C', '#D6FF70', '#3DA9F5',   /* 카키, 주황, 라임, 파랑 */
+    '#868198', '#F5B7C8', '#F2C230', '#2FA37A',   /* 라벤더 그레이, 분홍, 머스터드, 초록 */
+    '#E6E4DE', '#9E2E2E', '#A9D6F2', '#E07A5F',   /* 밝은 회색, 적갈색, 연하늘, 테라코타 */
+    '#6D7FD8', '#F6E27A', '#8FD3C1', '#C9B48A',   /* 페리윙클, 연노랑, 민트, 탠 */
+    '#B9A0D6', '#5E8C61', '#FF8FB1', '#D9D2C3',   /* 라일락, 세이지, 핫핑크, 오트 */
+  ];
+  /* 같은 색이 옆이나 위아래로 붙지 않게 고른 순서 */
+  const ORDER = PALETTE.map((_, i) => i);   /* 스무 권 모두 다른 색 */
+  const tint = (hex, a) => { const n = parseInt(hex.slice(1), 16), f = c => Math.round(c + (255 - c) * a); return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`; };
+  const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const pad = n => String(n).padStart(2, '0');
+
+  const grid = document.getElementById('grid');
+  const wrap = document.getElementById('wrap');
+  const page = document.getElementById('page');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let current = 0, last = null;
+
+  // 서가 위 서문: 책 쪼개기
+  const introEl = document.getElementById('intro');
+  introEl.innerHTML = `<blockquote>“${esc(INTRO.q)}”<cite>${esc(INTRO.qa)}</cite></blockquote>
+    <div><p>${esc(INTRO.p[0])}</p><button id="introBtn">책 쪼개기, 펼쳐 읽기</button></div>`;
+  const intro = document.getElementById('introBtn');
+  intro.addEventListener('click', () => open(-1, intro));
+
+  // 서가: 한 칸에 한 권
+  const tiles = C.map((c, i) => {
+    const color = PALETTE[ORDER[i % ORDER.length]];
+    const cell = document.createElement('div'); cell.className = 'cell';
+    const b = document.createElement('button');
+    b.className = 'bk';
+    b.style.setProperty('--c', color);
+    b.setAttribute('aria-label', `${pad(i + 1)}. ${c.t}`);
+    b.innerHTML = `<span class="t">${esc(c.t)}</span><span class="e">${esc(c.en)}</span>`;
+    b.addEventListener('click', () => open(i, b));
+    cell.appendChild(b); grid.appendChild(cell);
+    return b;
+  });
+
+  function fill(i) {
+    current = i;
+    const c = i < 0 ? INTRO : C[i];
+    const color = i < 0 ? '#E6E4DE' : PALETTE[ORDER[i % ORDER.length]];
+    page.style.setProperty('--pc', tint(color, .72));
+    page.innerHTML = `
+      <div class="side"><span>UNSTITCH</span><span class="pub">사인칭</span></div>
+      <div class="main">
+        <div class="top"><span class="lab">${esc(c.en)}</span><span class="num">${i < 0 ? '00' : pad(i + 1)}</span></div>
+        <div class="lines" tabindex="0">
+          <p class="tt"><b>${esc(c.t)}</b>${c.sub ? ` — ${esc(c.sub)}` : ''}</p>
+          ${c.q ? `<p class="qq">“${esc(c.q)}”</p>` : ''}
+          ${c.p.map(x => `<p>${esc(x)}</p>`).join('')}
+        </div>
+        <div class="bot"><span>책을 해체하라<br>${esc(c.t)}</span><span class="r">${esc(c.qa || '')}</span></div>
+      </div>`;
+    page.querySelector('.lines').scrollTop = 0;
+  }
+
+  function open(i, from) {
+    last = from; fill(i);
+    wrap.classList.add('show'); wrap.setAttribute('aria-hidden', 'false');
+    setTimeout(() => document.getElementById('cl').focus({ preventScroll: true }), reduce ? 0 : 150);
+  }
+  function step(d) {
+    const n = current + d;
+    const next = n < -1 ? C.length - 1 : n >= C.length ? -1 : n;
+    fill(next); last = next < 0 ? intro : tiles[next];
+  }
+  function close() {
+    wrap.classList.remove('show'); wrap.setAttribute('aria-hidden', 'true');
+    if (last) last.focus({ preventScroll: true });
+  }
+  document.getElementById('pv').addEventListener('click', () => step(-1));
+  document.getElementById('nx').addEventListener('click', () => step(1));
+  document.getElementById('cl').addEventListener('click', close);
+  wrap.addEventListener('click', e => { if (e.target === wrap) close(); });
+  document.addEventListener('keydown', e => {
+    if (!wrap.classList.contains('show')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowRight') step(1);
+    if (e.key === 'ArrowLeft') step(-1);
+  });
+</script>
+
+<script>
+  /* 책이 입은 옷: 행택 데이터 (웹-책분석 PDF에서 옮김) */
+  const COB = [{"id": "medusa", "title": "메두사의 웃음", "designer": "김동신", "page": "160p", "size": "140×220mm", "binding": "양장 제본", "colors": ["#FF70B3", "#A02015"], "cover": "covers/medusa-cover.jpg", "spread": "covers/medusa-spread.jpg", "story": "『메두사의 웃음』은 여성적 글쓰기의 선언문이다. 형태가 내용을 다시 쓸 수 있다면 이런 모습이 아닐까. 이미 출간된 적이 있는 이 책은 다시금 몸에 맞는 새 옷을 입은 것 같다. 경계를 넘는 식수의 선언이 경계를 넘는 형태가 된다. 디자이너의 언어로 다시 쓰이면서(번역되면서) 작가의 선언을 담은 동시에 디자이너의 선언으로도 다가온다.", "quote": "책의 제본 영역을 중요한 디자인 요소로 끌어들이는 콘셉트의 시안입니다. 펼침면 가운데에 있는 제본 영역은 종이가 종이 더미가 아니라 책이 되려면 생길 수밖에 없는, 책의 기원지 같은 곳이고, 동시에 지면을 좌수와 우수로 강력하게 분리하는 경계이며, 글자가 그쪽에 가까워질수록 안으로 빨려 들어가서 잘 읽을 수 없게 되는 협곡 내지 블랙홀이기도 한, 책이라는 물체에서 여러 가지로 중요한 의미가 있는 공간입니다.… 글줄이 왼쪽과 오른쪽 페이지 별도로 흐르는 것이 아니라 제본 영역을 넘어서 양면을 연결하도록 배열되어 있어 글을 읽으려면 말 그대로 경계를 계속 가로질러야 합니다.", "by": "김동신 디자이너", "spec": [["서체", "지백체"], ["글자수", "9~14글자"], ["행수", "20행"], ["흘림", "양쪽 흘림"], ["글줄 폭", "60mm"], ["여백", "위 11mm | 아래 18mm | 밖 68mm | 안 10mm"]]}, {"id": "heteronym", "title": "이명의 탄생", "designer": "김주화", "page": "292p", "size": "130×210mm", "binding": "무선제본", "colors": ["#918F8F", "#000000"], "cover": "covers/heteronym-cover.jpg", "spread": "covers/heteronym-spread.jpg", "story": "페르난도 페소아는 생전에 70여 개의 다른 이름으로 글을 쓴 작가다. 단순한 필명이 아니라 각각 고유한 문체와 삶, 인격을 가진 존재들이었다. 그의 문학 에세이인 이 책의 표지에는 이름들이 도장 찍듯 마구 찍혀 있다. ‘이명’은 그의 문학적 입장이자 대표적 개념으로 서로 다른 자아들이 저마다의 목소리로 말을 건넨다. 표지는 마치 그 여러 목소리들이 탄생하듯 한꺼번에 터져 나오며, 지면을 자유로이 넘나들고 경계를 허문다. 이를 가로지르는 얇은 선은 두꺼운 서체와 대비되어 문학적 고뇌의 흔적처럼 느껴진다. 저마다 다른 방향으로 흩어진 이름들은 하나의 정체성에 정박하기를 거부한 페소아와 닮아 있다.", "quote": "이렇게 결코 존재한 적 없는 친구와 지인들을 다듬어내고, 증식시켰지만, 거의 30년에 가까운 시간이 지난 오늘까지도, 듣고, 느끼고, 본다. 다시 말하지, 듣고, 느끼고, 본다. 그리고 그들을 그리워한다.", "by": "페르난도 페소아", "spec": [["서체", "SD정체"], ["글자수", "21~24글자"], ["행수", "25행"], ["흘림", "양쪽 흘림"], ["글줄 폭", "90mm"], ["여백", "위 16mm | 아래 34mm | 밖 14mm | 안 22mm"]]}, {"id": "nox", "title": "책을 덮고 삶을 열다", "designer": "오혜진", "page": "184p", "size": "125×210mm", "binding": "무선제본", "colors": ["#FFFFFF", "#000000"], "cover": "covers/nox-cover.jpg", "spread": "", "story": "녹스 출판사의 첫 책, 이 책은 랩으로 포장되어 있다. 랩을 뜯는 순간, 그 이유가 드러난다. 보통의 책들이 저자 소개가 담긴 앞날개를 안쪽으로 접혀 감추는 것과 달리, 이 책은 앞날개가 바깥을 향해 열려 있다. 긴 날개를 펼쳐 마주한 표지는 하나의 소우주 같다. 검은 바탕에 안개처럼 번지는 흰색 그라데이션, 그 사이로 떠다니는 연두와 파랑의 작은 입자들. 스프레이로 분무된 듯한 입자들은 통제할 수 없이 흩어져 각자의 궤도를 그리고 있다. 마치 책을 덮고 삶을 여는 불확실성과, 동시에 무한히 펼쳐질 가능성의 이미지를 표현한 것처럼 보인다. 어둠 속에서 빛나는 입자들처럼 삶도 예측할 수 없는 방향으로 흩어지고 번져간다. 저자가 덮은 수많은 책이 불쑥불쑥 모습을 드러내듯, 우리가 읽은 책들 역시 각자의 궤도를 그리며 삶 속에서 이어질 것이다.", "quote": "", "by": "", "spec": []}];
+  (() => {
+    const box = document.getElementById('tags'), wrap = document.getElementById('cobWrap'), sheet = document.getElementById('cobSheet');
+    const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const sw = cs => cs.map(c => `<span class="sw" style="background:${c}"></span>`).join('');
+    let cur = 0, last = null;
+    COB.forEach((b, i) => {
+      const el = document.createElement('button');
+      el.className = 'tg'; el.setAttribute('aria-label', `${b.title} 행택 열기`);
+      el.innerHTML = `<span class="in"><span class="face front"><dl>
+          <dt>Title</dt><dd>${esc(b.title)}</dd><dt>Designer</dt><dd>${esc(b.designer)}</dd>
+          <dt>Page</dt><dd>${esc(b.page)}</dd><dt>Size</dt><dd>${esc(b.size)}</dd>
+          <dt>Color</dt><dd>${sw(b.colors)}</dd><dt>Binding</dt><dd>${esc(b.binding)}</dd></dl></span>
+        <span class="face back" style="background-image:url('${b.cover}')"></span></span>`;
+      el.addEventListener('click', () => { last = el; open(i); });
+      const slide = document.createElement('div'); slide.className = 'slide'; slide.appendChild(el);
+      box.appendChild(slide);
+    });
+    // 한 장씩 넘기기: 아래 숫자를 누르거나 옆으로 쓸어 넘긴다
+    const slides = [...box.children], nav = document.getElementById('tNav');
+    const nums = slides.map((_, i) => { const b = document.createElement('button'); b.textContent = String(i + 1).padStart(2, '0'); b.setAttribute('aria-label', `${i + 1}번째 행택`); b.addEventListener('click', () => show(i)); nav.appendChild(b); return b; });
+    let at = 0;
+    const mark = () => nums.forEach((b, i) => b.setAttribute('aria-current', i === at));
+    const show = i => { at = (i + slides.length) % slides.length; mark(); box.scrollTo({ left: box.clientWidth * at, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); };
+    box.addEventListener('scroll', () => { const i = Math.round(box.scrollLeft / box.clientWidth); if (i !== at) { at = i; mark(); } }, { passive: true });
+    mark();
+    function fill(i) {
+      const b = COB[i]; cur = i;
+      sheet.innerHTML = `<div class="pic"><img src="${b.cover}" alt="${esc(b.title)} 표지"></div>
+        <div class="txt">
+          <div class="bar"><span>clothing of book, ${String(i + 1).padStart(2, '0')} / ${String(COB.length).padStart(2, '0')}</span><button id="cobClose">close</button></div>
+          <h3>${esc(b.title)}</h3>
+          <dl class="meta"><dt>Designer</dt><dd>${esc(b.designer)}</dd><dt>Page</dt><dd>${esc(b.page)}</dd><dt>Size</dt><dd>${esc(b.size)}</dd><dt>Color</dt><dd>${sw(b.colors)}</dd><dt>Binding</dt><dd>${esc(b.binding)}</dd></dl>
+          <p class="story">${esc(b.story)}</p>
+          ${b.quote ? `<blockquote>“${esc(b.quote)}”<cite>${esc(b.by)}</cite></blockquote>` : ''}
+          ${b.spec.length ? `<table>${b.spec.map(([k, v]) => `<tr><th>${k}</th><td>${esc(v)}</td></tr>`).join('')}</table>` : ''}
+          ${b.spread ? `<img class="spread" src="${b.spread}" alt="${esc(b.title)} 본문 펼침면">` : ''}
+          <div class="nav"><button id="cobPrev">prev</button><button id="cobNext">next</button></div>
+        </div>`;
+      sheet.scrollTop = 0;
+      document.getElementById('cobClose').onclick = close;
+      document.getElementById('cobPrev').onclick = () => fill((cur - 1 + COB.length) % COB.length);
+      document.getElementById('cobNext').onclick = () => fill((cur + 1) % COB.length);
+    }
+    function open(i) { fill(i); wrap.classList.add('show'); wrap.setAttribute('aria-hidden', 'false'); setTimeout(() => document.getElementById('cobClose').focus({ preventScroll: true }), 150); }
+    function close() { wrap.classList.remove('show'); wrap.setAttribute('aria-hidden', 'true'); if (last) last.focus({ preventScroll: true }); }
+    wrap.addEventListener('click', e => { if (e.target === wrap) close(); });
+    document.addEventListener('keydown', e => {
+      if (!wrap.classList.contains('show')) return;
+      if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') fill((cur + 1) % COB.length); if (e.key === 'ArrowLeft') fill((cur - 1 + COB.length) % COB.length);
+    });
+  })();
+</script>
+</body>
+</html>

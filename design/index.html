@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="description" content="직접 지은 책들의 책장.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="book design — 아침의 북디자인">
+<meta property="og:description" content="직접 지은 책들의 책장.">
+<meta property="og:url" content="https://4inchingpress-create.github.io/portfolio/design/">
+<meta property="og:image" content="https://4inchingpress-create.github.io/portfolio/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>book design — 4inching press</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond&family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: "SeMyungjo";
+    src: local("SM세명조"), local("SMSeMyungJo"), local("SMSeMyungJo-Regular"),
+         local("SM SeMyungJo Std"), local("SMSeMyungJoStd-Regular"),
+         url("../fonts/SMSeMyungJo.woff2") format("woff2");
+    font-display: swap;
+  }
+  :root {
+    --bg: #070303; --text: #EEEAE2; --dim: #4A4540; --muted: #8C877F;
+    --paper: #FBF8F1; --ink: #1A1A1A;
+    --serif: "SeMyungjo", "EB Garamond", "Nanum Myeongjo", serif;
+    /* 책장 높이: 250mm 책이 이 높이. 1mm = --k */
+    --shelf: min(46vh, 440px);
+    --k: calc(var(--shelf) / 255);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--serif); display: flex; flex-direction: column; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  .bar { display: flex; justify-content: space-between; padding: 22px 28px 0; font-size: 15px; }
+  .bar a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .bar span { color: var(--muted); }
+  .filters { padding: 14px 28px 0; font-size: clamp(28px, 3.8vw, 58px); line-height: 1.12; letter-spacing: -.01em; }
+  .filters button { color: var(--dim); transition: color .2s; }
+  .filters button:hover { color: #9D978D; }
+  .filters button[aria-pressed="true"] { color: var(--text); }
+  .filters .sep { color: var(--dim); margin-right: .25em; }
+
+  /* 책장 */
+  .shelf-wrap { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 36px 0 26px; }
+  .shelf {
+    display: flex; align-items: flex-end;
+    gap: calc(var(--k) * 1.2);
+    padding: 30px 28px 0;
+    overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth;
+  }
+  .shelf::-webkit-scrollbar { display: none; }
+  .shelf::before, .shelf::after { content: ""; margin: auto; } /* 책이 적을 땐 가운데 */
+  .baseline { height: 1px; background: var(--text); margin: 0 28px; opacity: .85; }
+
+  .vol {
+    flex: none; position: relative;
+    height: calc(var(--k) * var(--h));
+    width: calc(var(--k) * var(--t));
+    transition: width .7s cubic-bezier(.45,.05,.2,1), transform .35s;
+  }
+  .vol.group-start { margin-left: calc(var(--k) * 14); }
+  .vol.group-start:first-of-type { margin-left: 0; }
+  .vol.main { width: calc(var(--k) * var(--w)); margin-left: calc(var(--k) * 8); margin-right: calc(var(--k) * 8); }
+  .vol .spine, .vol .front { position: absolute; inset: 0; transition: opacity .45s; }
+  .vol .spine {
+    background: var(--sc); color: var(--si);
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: calc(var(--k) * 7) 0 calc(var(--k) * 6);
+    box-shadow: inset calc(var(--k) * 1) 0 0 rgba(255,255,255,.12), inset calc(var(--k) * -1) 0 0 rgba(0,0,0,.18);
+    overflow: hidden;
+  }
+  .vol .spine .st {
+    writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap;
+    font-size: max(8px, min(calc(var(--k) * 6.2), calc(var(--k) * var(--h) * .74 / var(--len)), calc(var(--k) * var(--t) * .7)));
+    line-height: 1; letter-spacing: .06em;
+  }
+  .vol .spine .sp { writing-mode: vertical-rl; font-size: max(7px, min(calc(var(--k) * 4.2), calc(var(--k) * var(--t) * .55))); opacity: .8; }
+  .vol .front { background: #222 center / 100% 100% no-repeat; opacity: 0; pointer-events: none; box-shadow: 0 0 0 1px rgba(255,255,255,.04); }
+  .vol.main .spine { opacity: 0; pointer-events: none; }
+  .vol.main .front { opacity: 1; pointer-events: auto; }
+  .vol:not(.main):hover { transform: translateY(calc(var(--k) * -6)); }
+  .vol.main:hover { transform: translateY(calc(var(--k) * -3)); }
+  .vol:focus-visible { outline: 2px solid var(--text); outline-offset: 4px; }
+  .vol.flat { width: calc(var(--k) * var(--w)); }
+  .vol.flat .spine { opacity: 0; pointer-events: none; }
+  .vol.flat .front { opacity: 1; pointer-events: auto; box-shadow: 0 0 0 1px rgba(255,255,255,.06); }
+  .vol.flat.main { margin-left: calc(var(--k) * 8); margin-right: calc(var(--k) * 8); }
+  /* study: 검은 행택 */
+  .tagface { background: var(--tc) !important; color: var(--ti); text-align: left; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 11% 12% !important; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; overflow: hidden; }
+  .tagface::before { content: ""; position: absolute; left: 50%; top: 7%; width: 9%; aspect-ratio: 1; border-radius: 50%; background: var(--bg); transform: translateX(-50%); z-index: 2; }
+  .tagface dl { display: grid; grid-template-columns: auto 1fr; column-gap: 10%; text-align: left; row-gap: 6px; font-size: clamp(11px, calc(var(--k) * 6.4), 15px); line-height: 1.35; position: relative; z-index: 1; }
+  .tagface dt { font-weight: 500; } .tagface dd { font-weight: 600; word-break: keep-all; }
+  body.study-mode { --shelf: min(64vh, 640px); --k: calc(var(--shelf) / 255); }
+  body.study-mode .shelf { scroll-snap-type: x mandatory; justify-content: flex-start; }
+  body.study-mode .vol.tag { scroll-snap-align: center; margin-left: calc((100vw - 56px - var(--k) * var(--w)) / 2) !important; margin-right: calc((100vw - 56px - var(--k) * var(--w)) / 2) !important; }
+  body.study-mode .shelf::before, body.study-mode .shelf::after { display: none; }
+  .tagface .cv { position: absolute; inset: 0; background: center / cover no-repeat; opacity: 0; transition: opacity .45s; z-index: 1; }
+  .vol.tag:hover .tagface .cv, .vol.tag:focus-visible .tagface .cv { opacity: 1; }
+  .vol[hidden] { display: none; }
+
+  .caption { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; padding: 14px 28px 0; }
+  .caption .ct { font-size: clamp(18px, 1.7vw, 24px); }
+  .caption .cm { margin-left: 14px; font-size: 15px; color: var(--muted); }
+  .caption button { font-size: 15px; border-bottom: 1px solid currentColor; padding-bottom: 2px; white-space: nowrap; }
+
+  /* 상세: 책이 펼쳐진다 */
+  .viewer { position: fixed; inset: 0; z-index: 50; background: rgba(7,3,3,.97); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .4s; }
+  .viewer.show { opacity: 1; pointer-events: auto; }
+  .viewer-bar { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 22px 28px; font-size: 15px; }
+  .viewer-bar button:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .viewer-nav { display: flex; gap: 22px; }
+  .vbook { position: relative; height: var(--DH); width: calc(var(--DH) * var(--w) / var(--h)); perspective: 2400px; transition: transform 1.6s cubic-bezier(.45,.05,.2,1); }
+  .vbook.open { transform: translateX(50%); }
+  .vpage, .vcover { position: absolute; inset: 0; }
+  .vpage { background: var(--paper); color: var(--ink); container-type: size; }
+  .vpage::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 10%; background: linear-gradient(90deg, rgba(0,0,0,.10), rgba(0,0,0,0)); }
+  .vcover { transform-origin: left center; transform-style: preserve-3d; transition: transform 1.6s cubic-bezier(.45,.05,.2,1); }
+  .vbook.open .vcover { transform: rotateY(-180deg); }
+  .vbook.flat, .vbook.flat .vcover { transition: none; }
+  .vface { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: #222 center / 100% 100% no-repeat; transition: background-image .3s; }
+  .vface.back { transform: rotateY(180deg); }
+  .colophon { position: absolute; inset: 0; padding: 10cqh 9cqw 8cqh; display: flex; flex-direction: column; overflow: hidden; }
+  .colophon.study { overflow-y: auto; display: block; padding-top: 8cqh; }
+  .colophon.study .des { margin-top: 3cqh; font-size: max(12px, 3.6cqw); color: #6E6860; }
+  .colophon.study .des b { font-weight: 400; color: #1A1A1A; font-size: 1.25em; }
+  .colophon.study h2 { margin-top: 2cqh; }
+  .colophon.study .memo { margin-top: 3.5cqh; }
+  .colophon.study blockquote { margin-top: 3cqh; padding-left: 3cqw; border-left: 1.5px solid #1A1A1A; font-size: max(11px, 3.3cqw); line-height: 1.8; color: #3A3632; word-break: keep-all; }
+  .colophon.study blockquote cite { display: block; margin-top: 1cqh; font-style: normal; color: #8C877F; }
+  .colophon.study dl { margin-top: 4cqh; }
+  .colophon.study .spr { margin-top: 3cqh; width: 100%; display: block; border: 1px solid #DDD7CC; }
+  .colophon .no { font-size: max(10px, min(3.2cqw, 1.9cqh)); color: var(--muted); }
+  .colophon h2 { margin-top: 9cqh; font-weight: 400; font-size: min(7.4cqw, 4.4cqh); line-height: 1.35; word-break: keep-all; }
+  .colophon .by { margin-top: 1.6cqh; font-size: max(11px, min(3.8cqw, 2.3cqh)); color: #4A4540; }
+  .colophon .memo { margin-top: 5cqh; font-size: max(11px, min(3.5cqw, 2.1cqh)); line-height: 1.85; color: #3A3632; word-break: keep-all; }
+  .colophon dl { margin-top: auto; display: grid; grid-template-columns: auto 1fr; column-gap: 5cqw; row-gap: 1cqh; padding-top: 2.4cqh; border-top: 1px solid #CFC7B8; font-size: max(10px, min(3.2cqw, 1.9cqh)); }
+  .colophon dt { color: var(--muted); }
+  .colophon .cuts { margin-top: 4cqh; display: flex; align-items: flex-end; gap: 2.4cqw; }
+  .colophon .cuts span { font-size: max(10px, min(3.2cqw, 1.9cqh)); color: var(--muted); margin-right: 1cqw; align-self: center; }
+  .colophon .cuts button { height: 9cqh; aspect-ratio: var(--ar); background: center / 100% 100% no-repeat; opacity: .7; transition: opacity .2s, transform .2s; }
+  .colophon .cuts button:hover { opacity: .8; }
+  .colophon .cuts button[aria-pressed="true"] { opacity: 1; transform: translateY(-3px); }
+  .colophon .cuts button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .colophon .sw { display: inline-block; width: 1.05em; height: 1.05em; margin-right: .35em; vertical-align: -.15em; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+
+  @media (max-width: 760px) {
+    .bar, .filters, .caption { padding-left: 18px; padding-right: 18px; }
+    .shelf { padding: 30px 18px 0; }
+    .baseline { margin: 0 18px; }
+    :root { --shelf: min(42vh, 320px); }
+    .caption { flex-direction: column; gap: 8px; }
+    .caption .cm { display: block; margin: 4px 0 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vol, .vol .spine, .vol .front, .vbook, .vcover, .viewer { transition: none !important; }
+  }
+
+  /* clothing of book: 행택을 크게 걸어 보기 (앞: 정보와 글 / 뒤: 표지) */
+  .tagview { position: fixed; inset: 0; z-index: 60; background: rgba(7,3,3,.95); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  .tagview.show { opacity: 1; pointer-events: auto; }
+  .tv-bar { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 22px 28px; font-size: 15px; }
+  .tv-nav { display: flex; gap: 22px; }
+  .tv-bar button:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .tv-hint { font-size: 13px; color: var(--muted); }
+  .bigtag { position: relative; height: min(80vh, 760px); aspect-ratio: 725 / 1222; max-width: 90vw; perspective: 1800px; cursor: pointer;
+            transform-origin: 50% 0; animation: swing 1.4s cubic-bezier(.3,.7,.2,1); }
+  @keyframes swing { 0% { transform: rotate(5deg); } 40% { transform: rotate(-3deg); } 70% { transform: rotate(1.4deg); } 100% { transform: none; } }
+  .bt-in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.3,.7,.2,1); }
+  .bigtag.flip .bt-in { transform: rotateY(180deg); }
+  .bt-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 24px 50px rgba(0,0,0,.45); }
+  .bt-face::before { content: ""; position: absolute; left: 50%; top: 5.5%; width: 7%; aspect-ratio: 1; border-radius: 50%; background: #070303; transform: translateX(-50%); z-index: 3; }
+  .bt-info { background: var(--tc); color: var(--ti); text-align: left; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; overflow-y: auto; padding: 22% 10% 9%; scrollbar-width: thin; }
+  .bt-info dl { display: grid; grid-template-columns: auto 1fr; column-gap: 12%; row-gap: 6px; font-size: 14px; line-height: 1.4; }
+  .bt-info dt { font-weight: 500; } .bt-info dd { font-weight: 600; word-break: keep-all; }
+  .bt-info .sw { display: inline-block; width: 15px; height: 15px; margin-right: 3px; vertical-align: -3px; border: 1px solid currentColor; }
+  .bt-info h4 { margin-top: 22px; padding-top: 14px; border-top: 1px solid currentColor; font-weight: 500; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .bt-info p { margin-top: 10px; font-family: var(--serif); font-size: 15px; line-height: 1.85; word-break: keep-all; }
+  .bt-info blockquote { margin-top: 14px; padding-left: 12px; border-left: 1.5px solid currentColor; font-family: var(--serif); font-size: 13.5px; line-height: 1.8; opacity: .85; word-break: keep-all; }
+  .bt-info blockquote cite { display: block; margin-top: 4px; font-style: normal; font-size: 12px; }
+  .bt-info table { margin-top: 10px; width: 100%; border-collapse: collapse; font-size: 13px; }
+  .bt-info th, .bt-info td { text-align: left; padding: 5px 0; border-bottom: 1px solid currentColor; font-weight: 500; vertical-align: top; }
+  .bt-info th { width: 28%; }
+  .bt-info img { margin-top: 12px; width: 100%; display: block; }
+  .bt-info .ft { margin-top: 22px; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; text-align: center; }
+  .bt-cover { transform: rotateY(180deg); background: #111 center / cover no-repeat; }
+  @media (prefers-reduced-motion: reduce) { .bigtag { animation: none; } .bt-in, .tagview { transition: none; } }
+
+</style>
+<style id="button-cursor">
+  /* 마우스 커서: 분홍 단추 (누를 수 있는 곳에서는 조금 커진다) */
+  html, body { cursor: url("data:image/png;base64,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") 13 13, auto; }
+  a, button, [role="button"], label, summary, select, .spot, .spot *, .tg, .bk, .vol, .story, .chip, .env, .mark, .tab, .box, .knob, .lever, .room-in {
+    cursor: url("data:image/png;base64,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") 18 18, pointer !important; }
+  input[type="text"], textarea { cursor: text; }
+</style>
+</head>
+<body>
+
+<nav class="bar">
+  <a href="../">book is open door</a>
+  <span id="count"></span>
+</nav>
+<div class="filters" id="filters" role="group" aria-label="분야"></div>
+
+<section class="shelf-wrap" aria-label="작업한 책들">
+  <div class="shelf" id="shelf"></div>
+  <div class="baseline"></div>
+  <div class="caption" aria-live="polite">
+    <p><span class="ct" id="ct"></span><span class="cm" id="cm"></span></p>
+    <button id="openMain">open the book</button>
+  </div>
+</section>
+
+<div class="tagview" id="tagView" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="tv-bar"><div class="tv-nav"><button id="tvPrev">prev</button><button id="tvNext">next</button></div><button id="tvClose">close</button></div>
+  <button class="bigtag" id="bigTag" aria-label="행택 뒤집기"><span class="bt-in">
+    <span class="bt-face bt-info" id="btInfo"></span>
+    <span class="bt-face bt-cover" id="btCover"></span>
+  </span></button>
+  <p class="tv-hint">행택을 누르면 뒤집혀요</p>
+</div>
+
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="작업 상세" aria-hidden="true">
+  <div class="viewer-bar">
+    <div class="viewer-nav"><button id="prev">prev</button><button id="next">next</button></div>
+    <button id="closeV">close</button>
+  </div>
+  <div class="vbook" id="vbook">
+    <div class="vpage"><div class="colophon" id="colophon"></div></div>
+    <div class="vcover">
+      <div class="vface back" id="vback"></div>
+      <div class="vface front" id="vfront"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ─────────────────────────────────────────────
+     작업 목록 (포트폴리오 PDF에서 옮김)
+     w, h: 판형(mm) / pages: 쪽수 / thick: 책등 두께(mm)
+     cover: 표지 이미지 / spineColor, spineInk: 책등 색과 글자 색
+     approx: true 인 책은 판형·쪽수를 모르는 책 (화면용 크기만 추정)
+     ───────────────────────────────────────────── */
+  const works = [
+ {
+  "id": "death",
+  "title": "( 죽음 )을 꿈꾸는 아이들",
+  "type": "essay",
+  "field": "에세이",
+  "w": 125,
+  "h": 200,
+  "pages": 184,
+  "author": "안병은",
+  "tools": "인디자인, 포토샵, 일러스트",
+  "finish": "홀로그램 박 + 오렌지 박 + 무광 코팅",
+  "memo": "죽음 너머 꿈꾸는 삶이 있다는 본문 내용을 담은 이미지를 구현했다. 또한 너머의 삶을 꿈꾸는 아이의 능동적인 모습을 강조했다.",
+  "palette": [
+   "#EC661C",
+   "#3681BD",
+   "#D2AF93"
+  ],
+  "cover": "covers/death.jpg",
+  "spineColor": "#FDFDFD",
+  "spineInk": "#1A1A1A",
+  "thick": 12
+ },
+ {
+  "id": "melancholy",
+  "title": "우울의 단상",
+  "type": "essay",
+  "field": "에세이",
+  "w": 120,
+  "h": 196,
+  "pages": 300,
+  "author": "장재열",
+  "tools": "인디자인, 포토샵, 일러스트",
+  "finish": "청박 + 무광 코팅",
+  "memo": "달의 주기에 따른 변화를 담았다.",
+  "palette": [
+   "#FFFFFF"
+  ],
+  "cover": "covers/melancholy.jpg",
+  "spineColor": "#FAFAFA",
+  "spineInk": "#1A1A1A",
+  "thick": 18
+ },
+ {
+  "id": "forty",
+  "title": "마흔, 너무 행복하지도 불행하지도 않게",
+  "type": "essay",
+  "field": "에세이",
+  "w": 128,
+  "h": 188,
+  "pages": 228,
+  "author": "변시영",
+  "tools": "인디자인, 일러스트",
+  "finish": "무광 코팅 | 적박",
+  "memo": "",
+  "palette": [
+   "#9B242A",
+   "#13131F"
+  ],
+  "cover": "covers/forty.jpg",
+  "spineColor": "#FFFFFF",
+  "spineInk": "#1A1A1A",
+  "thick": 15,
+  "spine": "마흔, 너무 행복하지도 불행하지도 않게"
+ },
+ {
+  "id": "savings",
+  "title": "청년내일채움공제 생존기",
+  "type": "essay",
+  "field": "에세이",
+  "w": 110,
+  "h": 178,
+  "pages": 180,
+  "author": "아침",
+  "tools": "인디자인, 포토샵, 일러스트",
+  "finish": "무광 코팅",
+  "memo": "청년내일채움공제 사이트를 착안, 구성해 앞표지는 1회차 도장이 뒷표지는 전체 회차 도장이 찍혀 있다.",
+  "palette": [
+   "#268744"
+  ],
+  "cover": "covers/savings.jpg",
+  "spineColor": "#E8E8E8",
+  "spineInk": "#1A1A1A",
+  "thick": 12
+ },
+ {
+  "id": "traveler",
+  "title": "여행자와 고양이",
+  "type": "essay",
+  "field": "에세이",
+  "w": 128,
+  "h": 188,
+  "pages": 252,
+  "author": "변종모",
+  "tools": "인디자인, 일러스트",
+  "finish": "자켓",
+  "memo": "",
+  "palette": [
+   "#9B242A",
+   "#13131F"
+  ],
+  "cover": "covers/traveler.jpg",
+  "spineColor": "#F5EBD5",
+  "spineInk": "#1A1A1A",
+  "thick": 19
+ },
+ {
+  "id": "wonderful",
+  "title": "기막히게 좋은 것",
+  "type": "essay",
+  "field": "에세이",
+  "w": 128,
+  "h": 188,
+  "pages": 296,
+  "author": "최갑수",
+  "tools": "인디자인, 일러스트",
+  "finish": "자켓",
+  "memo": "",
+  "palette": [
+   "#FFFFFF",
+   "#F16C05"
+  ],
+  "cover": "covers/wonderful.jpg",
+  "spineColor": "#A1CCCA",
+  "spineInk": "#1A1A1A",
+  "thick": 21
+ },
+ {
+  "id": "alone",
+  "title": "그때 나는 혼자였고 누군가의 인사가 그리웠으니까",
+  "type": "essay",
+  "field": "사진 에세이",
+  "w": 128,
+  "h": 188,
+  "pages": 300,
+  "author": "윤두열",
+  "tools": "인디자인, 포토샵, 일러스트",
+  "finish": "은박 + 무광 코팅",
+  "memo": "저자의 방의 모습과 뒷표지는 창문 너머 보이는 모습으로, 작가의 이야기로 들어감과 나옴을 앞뒤로 연결되는 이미지로 표현했다.",
+  "palette": [
+   "#655033",
+   "#69795F",
+   "#D2AF93"
+  ],
+  "cover": "covers/alone.jpg",
+  "spineColor": "#535745",
+  "spineInk": "#F6F2EA",
+  "thick": 18
+ },
+ {
+  "id": "vanish",
+  "title": "우리는 모두 아름답게 사라지는 거야",
+  "type": "essay",
+  "field": "사진 에세이",
+  "w": 128,
+  "h": 188,
+  "pages": 300,
+  "author": "윤두열",
+  "tools": "인디자인, 포토샵, 일러스트",
+  "finish": "무광 코팅",
+  "memo": "붉은 여우와 하얀 눈이 대비될 수 있도록 전체 톤을 조정했다.",
+  "palette": [
+   "#C2723B",
+   "#69ACC6",
+   "#FFFFFF"
+  ],
+  "cover": "covers/vanish.jpg",
+  "spineColor": "#C4C3C3",
+  "spineInk": "#1A1A1A",
+  "thick": 18
+ },
+ {
+  "id": "honeymoon",
+  "title": "해외로 도망친 철없는 신혼부부",
+  "type": "essay",
+  "field": "여행 에세이",
+  "w": 128,
+  "h": 188,
+  "pages": 300,
+  "author": "이다희",
+  "tools": "인디자인, 포토샵, 일러스트",
+  "finish": "무광 코팅",
+  "memo": "휴양지에서 쉬고 있는 신혼부부를 벡터로 표현했다. 언제든지 떠날 수 있는 캐리어와 디지털 노마드를 연상하는 요소를 더했다.",
+  "palette": [
+   "#602993",
+   "#71D1ED",
+   "#E12531"
+  ],
+  "cover": "covers/honeymoon.jpg",
+  "spineColor": "#938BAB",
+  "spineInk": "#1A1A1A",
+  "thick": 18
+ },
+ {
+  "id": "ogori",
+  "title": "어슬렁 오고리",
+  "type": "essay",
+  "field": "여행 에세이",
+  "w": 180,
+  "h": 130,
+  "pages": 82,
+  "author": "박선영",
+  "tools": "인디자인, 포토샵, 일러스트",
+  "finish": "무광 코팅",
+  "memo": "단정하고 정갈한 느낌의 사진과 어울리는 표지와 본문으로 구성했다.",
+  "palette": [
+   "#C48F6D",
+   "#B0B394",
+   "#231F20"
+  ],
+  "cover": "covers/ogori.jpg",
+  "spineColor": "#F3F6E9",
+  "spineInk": "#1A1A1A",
+  "thick": 7
+ },
+ {
+  "id": "cactus",
+  "title": "선인장은 밤에 꽃을 피운다",
+  "type": "fiction",
+  "field": "소설",
+  "w": 128,
+  "h": 188,
+  "pages": 300,
+  "author": "샤니 무투 (임슬애 옮김)",
+  "tools": "인디자인, 포토샵, 일러스트",
+  "finish": "금박 + 무광 코팅",
+  "memo": "선인장의 가시 모양을 나방으로 표현했다. 반짝이는 부분과 타이포에 금박이 들어간다.",
+  "alts": [
+   {"img": "covers/cactus-b1.jpg", "cap": "B컷. 선인장 일러스트를 단순화했다."},
+   {"img": "covers/cactus-b2.jpg", "cap": "B컷. 까만 밤에 피어난 나방의 모습을 홀로그램으로 표현했다."},
+   {"img": "covers/cactus-b3.jpg", "cap": "B컷. 보라색으로 나방 사진의 톤을 조정했다."}
+  ],
+  "palette": [
+   "#192717",
+   "#DE8943",
+   "#73B58C"
+  ],
+  "cover": "covers/cactus.jpg",
+  "spineColor": "#153116",
+  "spineInk": "#F6F2EA",
+  "thick": 18
+ },
+ {
+  "id": "loveid",
+  "title": "러브아이덴티티",
+  "type": "humanities",
+  "field": "인문 심리",
+  "w": 105,
+  "h": 148,
+  "pages": 280,
+  "author": "앤드쌤",
+  "tools": "인디자인, 일러스트",
+  "finish": "양장 제작 | 적박",
+  "memo": "",
+  "palette": [
+   "#F0BCCF",
+   "#D0111B"
+  ],
+  "cover": "covers/loveid.jpg",
+  "spineColor": "#D9A0B2",
+  "spineInk": "#1A1A1A",
+  "thick": 20,
+  "publisher": "사인칭"
+ },
+ {
+  "id": "lovehungry",
+  "title": "사랑-고파",
+  "type": "humanities",
+  "field": "인문 사회",
+  "w": 128,
+  "h": 188,
+  "pages": 250,
+  "author": "이유정 (출간 예정)",
+  "tools": "인디자인, 일러스트",
+  "finish": "무광 코팅",
+  "memo": "표지 그림과 어울리는 꽃받침 띠지를 더했다.",
+  "palette": [
+   "#FAB5C6",
+   "#6BC96A",
+   "#FDE4C4"
+  ],
+  "cover": "covers/lovehungry.jpg",
+  "spineColor": "#C3C09E",
+  "spineInk": "#1A1A1A",
+  "thick": 16
+ },
+ {
+  "id": "technology",
+  "title": "테크놀로지",
+  "type": "humanities",
+  "field": "교양 철학",
+  "w": 150,
+  "h": 220,
+  "pages": 640,
+  "author": "문종만",
+  "tools": "인디자인, 일러스트",
+  "finish": "무광",
+  "memo": "",
+  "palette": [
+   "#231F20",
+   "#FFFFFF"
+  ],
+  "cover": "covers/technology.jpg",
+  "spineColor": "#FBEE06",
+  "spineInk": "#1A1A1A",
+  "thick": 37,
+  "note": "본문 작업 참여"
+ },
+ {
+  "id": "knowledge",
+  "title": "지식의 지도",
+  "type": "humanities",
+  "field": "서양 중세사",
+  "w": 150,
+  "h": 220,
+  "pages": 428,
+  "author": "바이얼릿 몰러",
+  "tools": "인디자인, 일러스트",
+  "finish": "무광",
+  "memo": "",
+  "palette": [
+   "#FBE78A",
+   "#3E3B3B"
+  ],
+  "cover": "covers/knowledge.jpg",
+  "spineColor": "#484341",
+  "spineInk": "#F6F2EA",
+  "thick": 26,
+  "note": "본문 작업 참여"
+ },
+ {
+  "id": "city1",
+  "title": "도시와 교회 1, 선 넘는 에큐메니컬",
+  "type": "periodical",
+  "field": "정기 간행물",
+  "w": 130,
+  "h": 224,
+  "pages": 130,
+  "author": "황푸화 외 필진",
+  "tools": "인디자인, 일러스트",
+  "finish": "무광",
+  "memo": "",
+  "palette": [
+   "#E50014",
+   "#FFFFFF"
+  ],
+  "cover": "covers/city1.jpg",
+  "spineColor": "#E30015",
+  "spineInk": "#F6F2EA",
+  "thick": 9,
+  "note": "본문 작업 참여",
+  "spine": "도시와 교회 1",
+  "series": "도시와 교회"
+ },
+ {
+  "id": "city2",
+  "title": "도시와 교회 2, 전쟁과 평화",
+  "type": "periodical",
+  "field": "정기 간행물",
+  "w": 130,
+  "h": 224,
+  "pages": 128,
+  "author": "황푸화 외 필진",
+  "tools": "인디자인, 일러스트",
+  "finish": "무광",
+  "memo": "",
+  "palette": [
+   "#359EDF",
+   "#FFFFFF"
+  ],
+  "cover": "covers/city2.jpg",
+  "spineColor": "#369EDF",
+  "spineInk": "#1A1A1A",
+  "thick": 9,
+  "note": "본문 작업 참여",
+  "spine": "도시와 교회 2",
+  "series": "도시와 교회"
+ },
+ {
+  "id": "city3",
+  "title": "도시와 교회 3, 전세사기",
+  "type": "periodical",
+  "field": "정기 간행물",
+  "w": 130,
+  "h": 224,
+  "pages": 132,
+  "author": "황푸화 외 필진",
+  "tools": "인디자인, 일러스트",
+  "finish": "무광",
+  "memo": "",
+  "palette": [
+   "#FFF200",
+   "#FFFFFF"
+  ],
+  "cover": "covers/city3.jpg",
+  "spineColor": "#FEF100",
+  "spineInk": "#1A1A1A",
+  "thick": 9,
+  "note": "본문 작업 참여",
+  "spine": "도시와 교회 3",
+  "series": "도시와 교회"
+ },
+ {
+  "id": "fly",
+  "title": "날아갈 거야",
+  "type": "children",
+  "field": "그림책",
+  "w": 185,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/fly.jpg",
+  "spineColor": "#95A4A5",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "bear",
+  "title": "곰이라고요, 곰!",
+  "type": "children",
+  "field": "그림책",
+  "w": 181,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/bear.jpg",
+  "spineColor": "#D7000F",
+  "spineInk": "#F6F2EA",
+  "thick": 8
+ },
+ {
+  "id": "tonight",
+  "title": "오늘 밤 꿈엔",
+  "type": "children",
+  "field": "그림책",
+  "w": 188,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/tonight.jpg",
+  "spineColor": "#E1DEE0",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "lemon",
+  "title": "레몬 아이",
+  "type": "children",
+  "field": "그림책",
+  "w": 187,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/lemon.jpg",
+  "spineColor": "#C77E63",
+  "spineInk": "#F6F2EA",
+  "thick": 8
+ },
+ {
+  "id": "companion",
+  "title": "길동무",
+  "type": "children",
+  "field": "그림책",
+  "w": 182,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/companion.jpg",
+  "spineColor": "#C2B183",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "noisy",
+  "title": "너무 시끄러워",
+  "type": "children",
+  "field": "그림책",
+  "w": 190,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/noisy.jpg",
+  "spineColor": "#168AC6",
+  "spineInk": "#F6F2EA",
+  "thick": 8
+ },
+ {
+  "id": "hideseek",
+  "title": "숨바꼭질이 좋아",
+  "type": "children",
+  "field": "그림책",
+  "w": 179,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/hideseek.jpg",
+  "spineColor": "#FFFFFF",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "hundert",
+  "title": "훈데르트바서의 집",
+  "type": "children",
+  "field": "그림책",
+  "w": 189,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/hundert.jpg",
+  "spineColor": "#48617D",
+  "spineInk": "#F6F2EA",
+  "thick": 8
+ },
+ {
+  "id": "doyouknow",
+  "title": "너, 그거 알아?",
+  "type": "children",
+  "field": "그림책",
+  "w": 176,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/doyouknow.jpg",
+  "spineColor": "#BEE2DC",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "whirlbird",
+  "title": "찾아라, 회오리새",
+  "type": "children",
+  "field": "그림책",
+  "w": 193,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/whirlbird.jpg",
+  "spineColor": "#978E8C",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "running",
+  "title": "달리기가 좋아!",
+  "type": "children",
+  "field": "그림책",
+  "w": 300,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/running.jpg",
+  "spineColor": "#B3C199",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "pine",
+  "title": "할아버지와 소나무",
+  "type": "children",
+  "field": "그림책",
+  "w": 326,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/pine.jpg",
+  "spineColor": "#C9C0B0",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "dawn",
+  "title": "새벽길",
+  "type": "children",
+  "field": "그림책",
+  "w": 282,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/dawn.jpg",
+  "spineColor": "#5298B1",
+  "spineInk": "#F6F2EA",
+  "thick": 8
+ },
+ {
+  "id": "hankodu",
+  "title": "한코두코",
+  "type": "children",
+  "field": "그림책",
+  "w": 251,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/hankodu.jpg",
+  "spineColor": "#D8D7C9",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "lullaby",
+  "title": "솔잎 자장가",
+  "type": "children",
+  "field": "그림책",
+  "w": 215,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/lullaby.jpg",
+  "spineColor": "#7D9290",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "tadpole",
+  "title": "내가 올챙이야?",
+  "type": "children",
+  "field": "그림책",
+  "w": 241,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/tadpole.jpg",
+  "spineColor": "#CDE1E6",
+  "spineInk": "#1A1A1A",
+  "thick": 8
+ },
+ {
+  "id": "sasha",
+  "title": "사샤의 자전거 세계 일주",
+  "type": "children",
+  "field": "그림책",
+  "w": 350,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/sasha.jpg",
+  "spineColor": "#309C9D",
+  "spineInk": "#F6F2EA",
+  "thick": 8
+ },
+ {
+  "id": "giant",
+  "title": "섬이 된 거인",
+  "type": "children",
+  "field": "어린이 도서",
+  "w": 182,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/giant.jpg",
+  "spineColor": "#A1141C",
+  "spineInk": "#F6F2EA",
+  "thick": 12
+ },
+ {
+  "id": "aq",
+  "title": "아큐정전",
+  "type": "children",
+  "field": "어린이 도서",
+  "w": 169,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/aq.jpg",
+  "spineColor": "#E60614",
+  "spineInk": "#F6F2EA",
+  "thick": 12
+ },
+ {
+  "id": "dreamkeeper",
+  "title": "드림 키퍼",
+  "type": "children",
+  "field": "어린이 도서",
+  "w": 160,
+  "h": 250,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/dreamkeeper.jpg",
+  "spineColor": "#093D20",
+  "spineInk": "#F6F2EA",
+  "thick": 12
+ },
+ {
+  "id": "whatdoing",
+  "title": "뭐하니?",
+  "type": "children",
+  "field": "보드북",
+  "w": 175,
+  "h": 170,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/whatdoing.jpg",
+  "spineColor": "#F2E834",
+  "spineInk": "#1A1A1A",
+  "thick": 14
+ },
+ {
+  "id": "picnic",
+  "title": "소풍 가요!",
+  "type": "children",
+  "field": "보드북",
+  "w": 141,
+  "h": 170,
+  "approx": true,
+  "publisher": "계수나무",
+  "cover": "covers/picnic.jpg",
+  "spineColor": "#4DBFC5",
+  "spineInk": "#1A1A1A",
+  "thick": 14
+ },
+{"id": "bookmarket", "title": "당신의 이야기를 책으로 만들어드립니다", "type": "poster", "field": "북 마켓 참여 포스터", "w": 176, "h": 250, "approx": true, "flat": true, "cover": "covers/poster-bookmarket.jpg", "spineColor": "#F2EFE8", "spineInk": "#1A1A1A", "alts": [{"img": "covers/poster-bookmarket-q.jpg", "cap": "함께 놓인 다섯 개의 질문."}], "thick": 2},
+{"id": "jeonse", "title": "고난받는 이들과 함께하는 부활절 연합예배", "type": "poster", "field": "전세사기 연합 포스터", "year": "2025", "w": 184, "h": 250, "approx": true, "flat": true, "cover": "covers/poster-jeonse.jpg", "spineColor": "#1A1A1A", "spineInk": "#F6F2EA", "thick": 2},
+{"id": "unstitch", "title": "Unstitch the Book", "type": "poster", "field": "개인 작업 포스터", "w": 184, "h": 250, "approx": true, "flat": true, "cover": "covers/poster-unstitch.jpg", "spineColor": "#F2EFE8", "spineInk": "#E0559A", "thick": 2}
+];
+
+  const types = [['all','all'], ['essay','essay'], ['fiction','fiction'], ['humanities','humanities'], ['periodical','periodical'], ['children','children'], ['poster','poster']];
+  const FEATURED = 'loveid';
+
+  const shelf = document.getElementById('shelf');
+  const filters = document.getElementById('filters');
+  const viewer = document.getElementById('viewer');
+  const vbook = document.getElementById('vbook');
+  const vfront = document.getElementById('vfront');
+  const vback = document.getElementById('vback');
+  const colophon = document.getElementById('colophon');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const pad = n => String(n).padStart(2, '0');
+  let main = 0, current = 0, visible = works.map((_, i) => i);
+
+  types.forEach(([key, label], i) => {
+    const b = document.createElement('button');
+    b.textContent = label; b.dataset.key = key; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.addEventListener('click', () => applyFilter(key));
+    filters.appendChild(b);
+    const s = document.createElement('span'); s.className = 'sep'; s.textContent = ','; filters.appendChild(s);
+  });
+
+  // 책장: 분야가 바뀌는 곳(그리고 시리즈)마다 간격
+  const vols = works.map((b, i) => {
+    const el = document.createElement('button');
+    const prev = works[i - 1];
+    const newGroup = !prev || prev.type !== b.type || (prev.field !== b.field && b.type === 'children');
+    el.className = 'vol' + (newGroup ? ' group-start' : '') + (b.flat ? ' flat' : '') + (b.tag ? ' tag' : '');
+    const label = b.spine || b.title;
+    el.style.cssText = `--w:${b.w}; --h:${b.h}; --t:${b.thick}; --sc:${b.spineColor}; --si:${b.spineInk}; --len:${Math.max(4, [...label].length)};` + (b.tag ? ` --tc:${b.tc}; --ti:${b.ti};` : '');
+    el.setAttribute('aria-label', `${b.title}${b.author ? ', ' + b.author : ''}`);
+    el.innerHTML = `
+      <span class="spine"><span class="st">${esc(label)}</span><span class="sp">${esc(b.series ? '' : (b.author || b.publisher || '').split(' (')[0])}</span></span>
+      ${b.tag ? `<span class="front tagface"><dl><dt>Title</dt><dd>${esc(b.title)}</dd><dt>Designer</dt><dd>${esc(b.designer)}</dd><dt>Page</dt><dd>${esc(b.page)}</dd><dt>Size</dt><dd>${esc(b.sizeText)}</dd><dt>Binding</dt><dd>${esc(b.binding)}</dd></dl><span class="cv" style="background-image:url('${b.cover}')"></span></span>`
+              : `<span class="front" style="background-image:url('${b.cover}')"></span>`}`;
+    el.addEventListener('click', () => { if (b.flat) { setMain(i, false); openWork(i); } else if (main === i) openWork(i); else setMain(i); });
+    shelf.appendChild(el);
+    return el;
+  });
+
+  function setMain(i, scroll = true) {
+    main = i;
+    vols.forEach((v, j) => v.classList.toggle('main', j === i));
+    const b = works[i];
+    document.getElementById('ct').textContent = b.title;
+    document.getElementById('cm').textContent = [b.author, b.field].filter(Boolean).join(', ');
+    document.getElementById('openMain').textContent = b.tag ? 'read the study' : b.flat ? 'view the poster' : 'open the book';
+    if (scroll) setTimeout(() => vols[i].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', inline: 'center', block: 'nearest' }), 380);
+  }
+  function applyFilter(key) {
+    filters.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.key === key ? 'true' : 'false'));
+    visible = works.map((_, i) => i).filter(i => key === 'all' || works[i].type === key);
+    vols.forEach((v, i) => v.hidden = !visible.includes(i));
+    const fi = works.findIndex(w => w.id === FEATURED);
+    setMain(key === 'all' && fi >= 0 ? fi : visible[0]);
+    document.getElementById('count').textContent = visible.length + (visible.length === 1 ? ' work' : ' works');
+  }
+  applyFilter('all');
+  document.getElementById('openMain').addEventListener('click', () => openWork(main));
+
+  // 마우스 휠로 책장을 옆으로
+  shelf.addEventListener('wheel', e => {
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && shelf.scrollWidth > shelf.clientWidth) {
+      shelf.scrollLeft += e.deltaY; e.preventDefault();
+    }
+  }, { passive: false });
+
+  // 상세
+  function fill(i) {
+    const b = works[i];
+    const DH = Math.min(window.innerHeight * 0.76, window.innerWidth * 0.44 * b.h / b.w);
+    vbook.style.cssText = `--w:${b.w}; --h:${b.h}; --DH:${DH}px`;
+    // 앞면은 표지, 넘긴 뒤 왼쪽 면은 그 책의 색 한 장
+    const plane = (b.palette && b.palette[0]) || b.spineColor;
+    const leftImg = b.flat ? `url('${b.cover}')` : 'none';
+    vbook.classList.toggle('flat', !!b.flat);
+    vfront.style.backgroundImage = `url('${b.cover}')`;
+    vback.style.backgroundImage = leftImg;
+    vback.style.backgroundColor = plane;
+    const rows = [
+      ['field', b.field],
+      ['publisher', b.publisher],
+      ['size', b.approx ? '' : `${b.w} × ${b.h} mm`],
+      ['pages', b.pages ? `${b.pages}쪽` : ''],
+      ['year', b.year],
+      ['finish', b.finish],
+      ['tools', b.tools],
+      ['colors', (b.palette || []).map(c => `<span class="sw" style="background:${c}"></span>`).join('')],
+      ['note', b.note],
+    ].filter(r => r[1]);
+    colophon.classList.toggle('study', !!b.tag);
+    if (b.tag) {
+      colophon.innerHTML = `
+        <span class="no">study ${pad(works.filter(w => w.tag).indexOf(b) + 1)} / ${pad(works.filter(w => w.tag).length)}, clothing of book</span>
+        <p class="des">Designer <b>${esc(b.designer)}</b></p>
+        <h2>${esc(b.title)}</h2>
+        <p class="memo">${esc(b.memo)}</p>
+        ${b.quote ? `<blockquote>“${esc(b.quote)}”<cite>${esc(b.by)}</cite></blockquote>` : ''}
+        <dl>${[['page', b.page], ['size', b.sizeText], ['binding', b.binding], ['colors', b.palette.map(c => `<span class="sw" style="background:${c}"></span>`).join('')], ...b.spec.map(([k, v]) => [k, v])]
+          .map(([k, v]) => `<dt>${k}</dt><dd>${k === 'colors' ? v : esc(v)}</dd>`).join('')}</dl>
+        ${b.spread ? `<img class="spr" src="${b.spread}" alt="${esc(b.title)} 본문 펼침면">` : ''}`;
+      colophon.scrollTop = 0;
+      return;
+    }
+    colophon.innerHTML = `
+      <span class="no">${b.flat ? 'poster' : 'book design'} ${pad(i + 1)} / ${pad(works.length)}, ${esc(b.type)}</span>
+      <h2>${esc(b.title)}</h2>
+      ${b.author ? `<p class="by">${esc(b.author)}</p>` : ''}
+      ${b.memo ? `<p class="memo" id="memo">${esc(b.memo)}</p>` : ''}
+      ${b.alts ? `<div class="cuts" role="group" aria-label="표지 시안"><span>cuts</span>${
+        [{ img: b.cover, cap: b.memo }, ...b.alts].map((c, n) =>
+          `<button style="--ar:${b.w}/${b.h}; background-image:url('${c.img}')" data-n="${n}" aria-pressed="false" aria-label="${n === 0 ? 'A컷' : 'B컷 ' + n}"></button>`).join('')
+      }</div>` : ''}
+      <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${k === 'colors' ? v : esc(v)}</dd>`).join('')}</dl>`;
+    // 시안을 고르면 왼쪽 표지와 설명이 바뀐다
+    if (b.alts) {
+      const cuts = [{ img: b.cover, cap: b.memo }, ...b.alts];
+      colophon.querySelectorAll('.cuts button').forEach(btn => btn.addEventListener('click', () => {
+        const on = btn.getAttribute('aria-pressed') === 'true';
+        const c = cuts[+btn.dataset.n];
+        vback.style.backgroundImage = on ? (b.flat ? `url('${b.cover}')` : 'none') : `url('${c.img}')`;
+        const m = document.getElementById('memo'); if (m) m.textContent = on ? b.memo : c.cap;
+        colophon.querySelectorAll('.cuts button').forEach(x => x.setAttribute('aria-pressed', (!on && x === btn) ? 'true' : 'false'));
+      }));
+    }
+  }
+
+  /* clothing of book: 행택 보기 */
+  const tagView = document.getElementById('tagView'), bigTag = document.getElementById('bigTag');
+  const tagIdx = () => works.map((w, i) => w.tag ? i : -1).filter(i => i >= 0);
+  let tagCur = -1;
+  function openTag(i) {
+    const b = works[i]; tagCur = i;
+    bigTag.classList.remove('flip');
+    bigTag.style.setProperty('--tc', b.tc); bigTag.style.setProperty('--ti', b.ti);
+    bigTag.style.animation = 'none'; void bigTag.offsetWidth; bigTag.style.animation = '';
+    document.getElementById('btCover').style.backgroundImage = `url('${b.cover}')`;
+    const info = document.getElementById('btInfo');
+    info.innerHTML = `<dl><dt>Title</dt><dd>${esc(b.title)}</dd><dt>Designer</dt><dd>${esc(b.designer)}</dd><dt>Page</dt><dd>${esc(b.page)}</dd>
+        <dt>Size</dt><dd>${esc(b.sizeText)}</dd><dt>Color</dt><dd>${b.palette.map(c => `<span class="sw" style="background:${c}"></span>`).join('')}</dd><dt>Binding</dt><dd>${esc(b.binding)}</dd></dl>
+      <h4>Story</h4><p>${esc(b.memo)}</p>
+      ${b.quote ? `<blockquote>“${esc(b.quote)}”<cite>${esc(b.by)}</cite></blockquote>` : ''}
+      ${b.spec.length ? `<h4>Typography</h4><table>${b.spec.map(([k, v]) => `<tr><th>${k}</th><td>${esc(v)}</td></tr>`).join('')}</table>` : ''}
+      ${b.spread ? `<img src="${b.spread}" alt="${esc(b.title)} 본문 펼침면">` : ''}
+      <p class="ft">clothing of book</p>`;
+    info.scrollTop = 0;
+    tagView.classList.add('show'); tagView.setAttribute('aria-hidden', 'false');
+    setTimeout(() => document.getElementById('tvClose').focus({ preventScroll: true }), 150);
+  }
+  function closeTag() { tagView.classList.remove('show'); tagView.setAttribute('aria-hidden', 'true'); if (vols[tagCur]) vols[tagCur].focus({ preventScroll: true }); }
+  bigTag.addEventListener('click', e => { if (e.target.closest('.bt-info') && document.getElementById('btInfo').scrollHeight > document.getElementById('btInfo').clientHeight && window.getSelection().toString()) return; bigTag.classList.toggle('flip'); });
+  document.getElementById('tvClose').addEventListener('click', closeTag);
+  const tagStep = d => { const ids = tagIdx(), p = ids.indexOf(tagCur); const n = ids[(p + d + ids.length) % ids.length]; setMain(n, false); openTag(n); };
+  document.getElementById('tvPrev').addEventListener('click', () => tagStep(-1));
+  document.getElementById('tvNext').addEventListener('click', () => tagStep(1));
+  tagView.addEventListener('click', e => { if (e.target === tagView) closeTag(); });
+  document.addEventListener('keydown', e => {
+    if (!tagView.classList.contains('show')) return;
+    if (e.key === 'Escape') closeTag(); if (e.key === 'ArrowRight') tagStep(1); if (e.key === 'ArrowLeft') tagStep(-1);
+  });
+
+  function openWork(i) {
+    if (works[i].tag) return openTag(i);
+    current = i; vbook.classList.remove('open'); fill(i);
+    viewer.classList.add('show'); viewer.setAttribute('aria-hidden', 'false');
+    setTimeout(() => vbook.classList.add('open'), reduce ? 0 : 350);
+    document.getElementById('closeV').focus({ preventScroll: true });
+  }
+  function closeWork() {
+    vbook.classList.remove('open');
+    setTimeout(() => { viewer.classList.remove('show'); viewer.setAttribute('aria-hidden', 'true'); vols[main].focus({ preventScroll: true }); }, reduce ? 0 : 900);
+  }
+  function step(d) {
+    const pos = visible.indexOf(current);
+    const n = visible[(pos + d + visible.length) % visible.length];
+    vbook.classList.remove('open');
+    setTimeout(() => { current = n; setMain(n, false); fill(n); setTimeout(() => vbook.classList.add('open'), 60); }, reduce ? 0 : 900);
+  }
+  document.getElementById('closeV').addEventListener('click', closeWork);
+  document.getElementById('prev').addEventListener('click', () => step(-1));
+  document.getElementById('next').addEventListener('click', () => step(1));
+  viewer.addEventListener('click', e => { if (e.target === viewer) closeWork(); });
+  document.addEventListener('keydown', e => {
+    if (!viewer.classList.contains('show')) return;
+    if (e.key === 'Escape') closeWork();
+    if (e.key === 'ArrowRight') step(1);
+    if (e.key === 'ArrowLeft') step(-1);
+  });
+
+</script>
+</body>
+</html>
