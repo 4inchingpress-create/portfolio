@@ -103,13 +103,11 @@
   .page-in {
     position: absolute; inset: 0;
     display: flex; flex-direction: column; align-items: center;
-    padding: 16cqw 13cqw 10cqw; text-align: center;
+    padding: 8cqw 11cqw; text-align: center; justify-content: center;
   }
-  .page-in .small { font-size: max(11px, 3.6cqw); color: #8C8577; }
-  .page-in .statement { margin-top: 30cqw; font-size: max(12px, 4.4cqw); line-height: 2; color: #2E2A26; word-break: keep-all; }
-  .page-in .sign { margin-top: 10cqw; font-size: max(12px, 4.4cqw); }
-  .page-in .close { margin-top: auto; font-size: max(11px, 3.6cqw); border-bottom: 1px solid currentColor; padding-bottom: 2px; }
-  .page-in .folio { margin-top: 5cqw; font-size: max(10px, 3.4cqw); color: #8C8577; }
+  .page-in .small, .page-in .sign, .page-in .folio, .face.back .folio, .face.back .hint { display: none !important; }  /* 본문 외 요소 숨김 */
+  .page-in .statement { margin: 0; font-size: clamp(11px, 4.3cqw, 17px); line-height: 1.72; color: #2E2A26; word-break: keep-all; }
+  .page-in .close { position: absolute; inset: 0; opacity: 0; font-size: 0; }  /* 글자 없이, 페이지를 누르면 책이 덮인다 */
 
   /* 표지 */
   .cover {
@@ -174,6 +172,12 @@
     line-height: 1.2;
     color: var(--label, #F6F2EA);
   }
+  /* 얇은 하늘색 막대: 이름을 한 줄로, 세로 가운데에 */
+  /* 열린 문 안의 이름: 면의 모양에 맞춰 크게 */
+  .room-in b { font-weight: 600; letter-spacing: .01em; }
+  .room-in.thin b { top: 50%; left: 8cqw; transform: translateY(-50%); white-space: nowrap; font-size: clamp(10px, 56cqh, 18px); line-height: 1; }
+  .room-in.wide b { left: 9cqw; top: 7cqh; right: 6cqw; font-size: clamp(11px, 15cqw, 32px); line-height: 1.1; white-space: nowrap; }
+  .room-in.tall b { left: 50%; top: 4cqh; transform: translateX(-50%); writing-mode: vertical-rl; white-space: nowrap; font-size: clamp(11px, 46cqw, 30px); line-height: 1; letter-spacing: .06em; }
   .leaf {
     position: absolute; inset: 0;
     background: var(--c);
@@ -230,7 +234,7 @@
       <div class="page" id="statement" aria-hidden="true">
         <div class="page-in">
           <span class="small">4inching press, book design</span>
-          <p class="statement">표지는 문짝이고 판형은 문틀입니다.<br>한 권의 책에 꼭 맞는 문을 짓고,<br>누군가 그 문을 열고 들어가<br>자기 자리를 찾게 하는 일을 합니다.</p>
+          <p class="statement">책은 하나의 열린 문입니다.<br><br>문을 열고 들어간 곳에서<br>누군가는 쉬어 가고, 사유하고,<br>움직이고, 꿈꿉니다.<br><br>그 첫걸음이 설레도록,<br>이야기마다 꼭 맞는 얼굴을 찾아<br>오래 머물고 싶은 자리를<br>만들고 싶습니다.</p>
           <span class="sign">사인칭 북디자인</span>
           <button class="close" id="close" tabindex="-1">close the book</button>
           <span class="folio">一</span>
@@ -247,25 +251,26 @@
         <div class="face front door" id="frontface" aria-label="색면으로 된 문">
           <button class="knob" id="knob" aria-label="큰 문 열기"></button>
 
-          <!-- 장식 -->
-          <div class="box" style="--x:75; --y:67; --w:136; --h:37; --c:#42BFEC"></div>
-
           <!-- 문이 되는 색면: 링크와 이름만 바꾸면 됩니다 -->
           <a class="box" href="sainching/" aria-label="4inching press"
-             style="--x:354; --y:67; --w:158; --h:220; --c:#F4C9DC; --in:#2B2440">
-            <span class="room-in"><b>4inching<br>press</b></span><span class="leaf"></span>
-          </a>
-          <a class="box" href="book/" aria-label="book, 책을 해체하라"
-             style="--x:70; --y:432; --w:167; --h:96; --c:#F5CE8E; --in:#42BFEC; --label:#1D2A4A">
-            <span class="room-in"><b>book</b></span><span class="leaf"></span>
-          </a>
-          <a class="box" href="design/" aria-label="book design"
-             style="--x:75; --y:730; --w:72; --h:357; --c:#B92D55; --in:#F3E6DC; --label:#B92D55">
-            <span class="room-in"><b>book<br>design</b></span><span class="leaf"></span>
+             style="--x:75; --y:67; --w:136; --h:37; --c:#42BFEC; --in:#2B2440">
+            <span class="room-in thin"><b>press</b></span><span class="leaf"></span>
           </a>
           <a class="box" href="booktailor/" aria-label="booktailor shop"
+             style="--x:354; --y:67; --w:158; --h:220; --c:#F4C9DC; --in:#2B2440">
+            <span class="room-in wide"><b>book<br>tailor<br>shop</b></span><span class="leaf"></span>
+          </a>
+          <a class="box" href="about/" aria-label="about, 경력"
+             style="--x:70; --y:432; --w:167; --h:96; --c:#F5CE8E; --in:#2B2440">
+            <span class="room-in wide"><b>about</b></span><span class="leaf"></span>
+          </a>
+          <a class="box" href="book/" aria-label="book, 책을 해체하라"
+             style="--x:75; --y:730; --w:72; --h:357; --c:#B92D55; --in:#F3E6DC; --label:#B92D55">
+            <span class="room-in tall"><b>book</b></span><span class="leaf"></span>
+          </a>
+          <a class="box" href="design/" aria-label="book design"
              style="--x:262; --y:730; --w:254; --h:356; --c:#1C776A; --in:#F3E6DC; --label:#1C776A">
-            <span class="room-in"><b>booktailor<br>shop</b></span><span class="leaf"></span>
+            <span class="room-in wide"><b>book<br>design</b></span><span class="leaf"></span>
           </a>
         </div>
       </div>

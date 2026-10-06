@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="description" content="북디자이너·출판인 아침의 경력.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="about — 아침, 북디자이너">
+<meta property="og:description" content="책의 기획과 편집, 디자인과 제작을 한 흐름으로 다룹니다.">
+<meta property="og:url" content="https://4inchingpress-create.github.io/portfolio/about/">
+<meta property="og:image" content="https://4inchingpress-create.github.io/portfolio/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>about — 4inching press</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond&family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: "SeMyungjo";
+    src: local("SM세명조"), local("SMSeMyungJo"), local("SMSeMyungJo-Regular"),
+         local("SM SeMyungJo Std"), local("SMSeMyungJoStd-Regular"),
+         url("../fonts/SMSeMyungJo.woff2") format("woff2");
+    font-display: swap;
+  }
+  /* 문 위의 모래색 면을 열고 들어온 방 */
+  :root {
+    --bg: #F5CE8E; --ink: #2B2440; --muted: #7C6A55; --rule: rgba(43,36,64,.28);
+    --serif: "SeMyungjo", "EB Garamond", "Nanum Myeongjo", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--serif); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+
+  .bar { display: flex; justify-content: space-between; padding: 22px 28px 0; font-size: 15px; }
+  .bar a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .bar span { color: var(--muted); }
+
+  main { max-width: 1080px; padding: 0 28px 120px; }
+
+  .name { padding-top: clamp(64px, 11vh, 130px); }
+  .name h1 { font-weight: 400; font-size: clamp(40px, 6.4vw, 92px); line-height: 1; letter-spacing: -.01em; }
+  .name h1 span { display: block; margin-top: .22em; font-size: .46em; letter-spacing: .01em; }
+  .name .role { margin-top: 26px; font-size: clamp(17px, 1.6vw, 21px); }
+
+  .intro { margin-top: clamp(40px, 6vh, 64px); max-width: 640px; font-size: clamp(16px, 1.35vw, 18px); line-height: 1.95; word-break: keep-all; }
+  .intro p + p { margin-top: .9em; }
+
+  section { display: grid; grid-template-columns: minmax(160px, 24%) 1fr; column-gap: 24px; margin-top: clamp(56px, 8vh, 88px); padding-top: 16px; border-top: 1px solid var(--rule); }
+  section h2 { font-weight: 400; font-size: clamp(18px, 1.6vw, 22px); letter-spacing: .01em; }
+  ol { list-style: none; }
+  li { display: grid; grid-template-columns: 7.2em 1fr; column-gap: 14px; padding: 7px 0; font-size: 16px; line-height: 1.7; word-break: keep-all; }
+  li + li { border-top: 1px solid rgba(43,36,64,.1); }
+  li time, li .y { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  li em { font-style: normal; color: var(--muted); }
+  li a, .intro a { border-bottom: 1px solid var(--rule); transition: border-color .2s; }
+  li a:hover, .intro a:hover { border-color: var(--ink); }
+
+  footer { margin-top: clamp(72px, 10vh, 110px); padding-top: 16px; border-top: 1px solid var(--rule); display: flex; gap: 28px; flex-wrap: wrap; font-size: 15px; }
+  footer a { border-bottom: 1px solid var(--rule); }
+  footer a:hover { border-color: var(--ink); }
+
+  @media (max-width: 760px) {
+    .bar { padding: 18px 18px 0; }
+    main { padding: 0 18px 90px; }
+    section { grid-template-columns: 1fr; row-gap: 12px; }
+    li { grid-template-columns: 5.6em 1fr; font-size: 15px; }
+  }
+</style>
+<style id="button-cursor">
+  /* 마우스 커서: 분홍 단추 (누를 수 있는 곳에서는 조금 커진다) */
+  html, body { cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAGHklEQVR42sWWXWxUxxXHfzNzd+/dveyu7cWfuAmNFQwNKRFB/YhEwSikTZQGmQikKFHVPlS8OG3Vh6ofERsjVUSR0pdGqK0qNQ+kkUzTKClCbaEYK1JopYiEUBpMCiLU2Bh/4PV6uZ8z04dr05ei9qXpSEcanXPmnPv/n3NnDtxhWRCjtZrDf7lGazXHgriT/d8abK0mxYFhg4X7ofUHX/7ezp72rh2VYmm9k3NWA6RJOlu/1bgwOXP95ME/vHj8HNxEgN1fk2J42PzHRHbPiBJH9uo2KL/65I+/29e7dl9f56e6pF8CITKsK0etxTQbXJr+x/VLE1d+/vTrP/rJPCyuxLhjotFtNWdgbDh9YfPTX3j8iztfua9vYz8S0IkGLMYIrM3OCGGR0gIClVMYOH/pr+NHTx//+vfPvPrnlVgrsW/XYGTPiBo4sjf91fZvPbnz8wOH1/R+2iNsJmjr6FSroBmQxgnaZKwoKXHyOQp+AeVoCyK9b/0D/S2rKqOd5eozA6eGXx/ZM6L2LiNTKzXZeGjIvPDg1z63+0tfObpmzVrPBEtaIJzFhUWxVG8gpcAteBSKBVzPRSpJGicsLS6hUy1cz1MmiXSlrT3fUW7Z1RG6f9x34rkJW6vJ4bExKy0ZFQ/RX3psy9bXenrvcU3Q1AKh5qZnMFpT7e6g0lmlUPLJuXlybp5CyafSWaXa3YHRmrnpGQRCmaCpe3rvcR/bsvW1h+gvZR1shXq+tt0Rw9/Qhwa/88OtD24dJA5SIXDmp2fxih7l1W2IMIUwBWtBLpc10RCkCGvxWktYrWksLOKXfEmapJ0dvdXOYjHu/1lt9PnadkfKAzvSXZVNLet67x5CYBHIxs1FlOPgt1QgSmBzN3x1HXSXIDWZdJcy3eZuiBL8lgrKcWjcXASBRGDX9d49tKuyqUUe2JFKay2Dmwce6eteW0UnRsepDIOISrUFghg+2wWP3gsPdMHuDbAqn8nuDZnu0XsznyCmUm0hDCJ0nEp0Yvq611YHNw88Yq1FAtzV0/uw8ksWsOGtgLybQzgKtIGeUkbVYgRlF0rLUnYzHWQ+2iAcRd7NEd4KAKzyS/aunt6HgSxRxS+tRwqBMSKOE1zPy+qRU3D2OjQiqLgwPgszzUzGZzNdI8p8cgqsxfU84jgBYwRSiIpfWn/7P3JVrg1rwVphjEE5CoyFnITJBrzyfoZippl9AMBb49DuZ4mW4szXWJSjMMaAtQJrs9griD6J5QBEOplHCBDCSinRqSZXEBDpjP/dG6CUh/G5DAnAE/3QX4VGDL/9MEPuOuhUI6XMrighstgriOrNxgWMtUhp8/kcURhmF2iiYVNXRls9gv7VGV3tfravR5ltU1fmKwRRGJLP50BKi7G23mxcuJ3o6uTECd1sCEB4xQJxlGBTDWq5RvCvLmssy0oXQuajJDbVxFGCVywACN1siKuTEycAlBACOx9c29L3mW9Wq11FKaw1aSqCZoDXUoLJxYyepRhOXYH5AGINE4tZkvevwwfXwctTn71JPp/DW1U0OHn596sfzf/097/+9sX4RijN/pPOm/WzCxcnPn4Zi8BiSq1ldJrSXKiDm4MzU/C7izDVAEdmMtXIdGemwM3RXKij05RSaxksBou4OPHxy2/Wzy6Y/ScdyfB2bWs1efCNwy+du/DeZTzfMcbqto7VhLdCFqZnMXmV0eQ6LDdNti+7mLxiYXqW8FZIW8dqjLEaz3fOXXjv8sE3Dr9kazXJ8HYtBcICvMN449i7bz81OXE5kgVfWayudrYjlWJu6gb16TmCRpMkikmimKDRpD49x9zUDaRSVDvbsVgtC76anLgcHXv37afeYbyRva7CKoDhsTE7smdE7Tvx3MT9uc4P28utT1SqnXl0krgFV3oFT2htSMKYMAiJwgiTapxcjnJrmYJfsAiRisIq59q1K+Hxv5x65tnTvzgxsmdEbTw0ZG4/fABH/nbEjm6rOYNjL57vCJw/tRb8rR3Vng4cR0gpdL7gGa/o2aJfoOgXrecXTb5YMFIpi+NKhKPOf/TB+G/Gjg4+e/qXx0e31ZzHjw3p/+9w8r8ct/ikBsh/At0YCnACU2mZAAAAAElFTkSuQmCC") 13 13, auto; }
+  a, button, [role="button"], label, summary, select, .spot, .spot *, .tg, .bk, .vol, .story, .chip, .env, .mark, .tab, .box, .knob, .lever, .room-in {
+    cursor: url("data:image/png;base64,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") 18 18, pointer !important; }
+  input[type="text"], textarea { cursor: text; }
+</style>
+</head>
+<body>
+
+<nav class="bar">
+  <a href="../">book is open door</a>
+  <span>about</span>
+</nav>
+
+<main>
+  <header class="name">
+    <h1>아침<span>Achim</span></h1>
+    <p class="role">Book Designer, Publisher</p>
+  </header>
+
+  <div class="intro">
+    <p>책의 기획과 편집, 디자인과 제작을 한 흐름으로 다룹니다. 잡지와 단행본의 편집 기획과 디자인을 거쳐 출판사 계수나무에서 그림책과 어린이책의 디자인과 제작을 총괄했습니다.</p>
+    <p>2024년 출판사 <a href="../sainching/">사인칭(4inching press)</a>을 열어, 한 권을 관통하는 저자의 질문에서 출발하는 책을 만들고 있습니다. 합정동의 <a href="../booktailor/">북테일러샵</a>에서는 한 사람에게 맞는 책을 고르고, 서랍 속 이야기를 책으로 지어 드립니다.</p>
+  </div>
+
+  <section aria-labelledby="h-exp">
+    <h2 id="h-exp">Experience</h2>
+    <ol>
+      <li><span class="y">2024–</span><span>출판사 사인칭(4inching press) 대표 <em>도서 기획·디자인·제작</em></span></li>
+      <li><span class="y">2024–</span><span>출판사 얼론북 <em>북디자인</em></span></li>
+      <li><span class="y">2019–2022</span><span>출판사 계수나무 과장 <em>편집디자인·제작 총괄</em></span></li>
+      <li><span class="y">2018</span><span>트래쁠 디자이너 <em>편집 기획·디자인</em></span></li>
+      <li><span class="y">2018</span><span>책문화연구소 <em>책자 디자인·제작</em></span></li>
+      <li><span class="y">2017–2018</span><span>KT&amp;G <em>책자 디자인·제작</em></span></li>
+      <li><span class="y">2017</span><span>독립잡지 티끌 편집장 <em>편집 기획·디자인</em></span></li>
+      <li><span class="y">2017</span><span>출판사 (밥) <em>도서 기획·디자인 감수</em></span></li>
+      <li><span class="y">2017</span><span>알라딘 종로점 <em>도서 입고·서가 관리</em></span></li>
+      <li><span class="y">2016</span><span>SONDER 매거진 VOL.1 에디터</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="h-shop">
+    <h2 id="h-shop">Bookshop &amp; Programs</h2>
+    <ol>
+      <li><span class="y">현재</span><span><a href="../booktailor/">북테일러샵</a> 운영 <em>합정동, 1:1 맞춤 북 큐레이션 서점</em></span></li>
+      <li><span class="y"></span><span>맞춤책 〈서랍 속 이야기〉 <em>편지·사진·일기를 한 권의 책으로</em></span></li>
+      <li><span class="y"></span><span>〈북마카세〉 <em>예약제 1인 북 큐레이션</em></span></li>
+      <li><span class="y"></span><span>〈책이 입은 옷〉 <em>표지를 읽고 다시 짓는 북디자인 프로그램</em></span></li>
+      <li><span class="y"></span><span>〈목소리들〉 〈여성적 쓰기〉 <em>읽기·쓰기 모임</em></span></li>
+      <li><span class="y"></span><span>하이쿠 워크숍</span></li>
+      <li><span class="y">2016</span><span>독립출판 수업 <em>강의 준비</em></span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="h-works">
+    <h2 id="h-works">Selected Works</h2>
+    <ol>
+      <li><span class="y">2025</span><span>〈고난받는 이들과 함께하는 부활절 연합예배〉 <em>전세사기 연합 포스터</em></span></li>
+      <li><span class="y"></span><span>『러브아이덴티티』 앤드쌤 <em>사인칭, 양장·적박</em></span></li>
+      <li><span class="y"></span><span>『도시와 교회』 1–3 <em>정기 간행물, 본문</em></span></li>
+      <li><span class="y"></span><span>『테크놀로지』 『지식의 지도』 <em>본문 작업 참여</em></span></li>
+      <li><span class="y"></span><span>『날아갈 거야』 『훈데르트바서의 집』 『사샤의 자전거 세계 일주』 외 <em>계수나무, 그림책·어린이책·보드북</em></span></li>
+      <li><span class="y"></span><span>『우울의 단상』 『( 죽음 )을 꿈꾸는 아이들』 『여행자와 고양이』 외 <em>에세이</em></span></li>
+      <li><span class="y"></span><span><a href="../design/">전체 작업 보기</a></span></li>
+    </ol>
+  </section>
+
+  <footer>
+    <a href="https://www.instagram.com/4inchingpress/">Instagram @4inchingpress</a>
+  </footer>
+</main>
+
+</body>
+</html>

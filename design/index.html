@@ -30,18 +30,22 @@
     --paper: #FBF8F1; --ink: #1A1A1A;
     --serif: "SeMyungjo", "EB Garamond", "Nanum Myeongjo", serif;
     /* 책장 높이: 250mm 책이 이 높이. 1mm = --k */
-    --shelf: min(46vh, 440px);
+    --shelf: min(52vh, 520px);
     --k: calc(var(--shelf) / 255);
+    /* 앞표지로 꺼낸 책: --big 배까지 키우되, 높이는 --cap(mm 환산)을 넘지 않게 */
+    --big: 1.9; --cap: 390;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  body { background: var(--bg); color: var(--text); font-family: var(--serif); display: flex; flex-direction: column; overflow-x: hidden; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--serif); overflow-x: hidden; }
+  .stage { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; }
   a { color: inherit; text-decoration: none; }
   button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 
   .bar { display: flex; justify-content: space-between; padding: 22px 28px 0; font-size: 15px; }
   .bar a:hover { text-decoration: underline; text-underline-offset: 4px; }
-  .bar span { color: var(--muted); }
+  .bar .count { color: var(--muted); }
+  .bar .count:hover { color: var(--text); }
   .filters { padding: 14px 28px 0; font-size: clamp(28px, 3.8vw, 58px); line-height: 1.12; letter-spacing: -.01em; }
   .filters button { color: var(--dim); transition: color .2s; }
   .filters button:hover { color: #9D978D; }
@@ -49,8 +53,9 @@
   .filters .sep { color: var(--dim); margin-right: .25em; }
 
   /* 책장 */
-  .shelf-wrap { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 36px 0 26px; }
+  .shelf-wrap { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px 0 26px; }
   .shelf {
+    position: relative;
     display: flex; align-items: flex-end;
     gap: calc(var(--k) * 1.2);
     padding: 30px 28px 0;
@@ -62,13 +67,14 @@
 
   .vol {
     flex: none; position: relative;
-    height: calc(var(--k) * var(--h));
+    --s: 1;
+    height: calc(var(--k) * var(--h) * var(--s));
     width: calc(var(--k) * var(--t));
-    transition: width .7s cubic-bezier(.45,.05,.2,1), transform .35s;
+    transition: width .7s cubic-bezier(.45,.05,.2,1), height .7s cubic-bezier(.45,.05,.2,1), transform .35s;
   }
   .vol.group-start { margin-left: calc(var(--k) * 14); }
   .vol.group-start:first-of-type { margin-left: 0; }
-  .vol.main { width: calc(var(--k) * var(--w)); margin-left: calc(var(--k) * 8); margin-right: calc(var(--k) * 8); }
+  .vol.main { --s: min(var(--big), calc(var(--cap) / var(--h))); width: calc(var(--k) * var(--w) * var(--s)); margin-left: calc(var(--k) * 12); margin-right: calc(var(--k) * 12); }
   .vol .spine, .vol .front { position: absolute; inset: 0; transition: opacity .45s; }
   .vol .spine {
     background: var(--sc); color: var(--si);
@@ -92,7 +98,7 @@
   .vol.flat { width: calc(var(--k) * var(--w)); }
   .vol.flat .spine { opacity: 0; pointer-events: none; }
   .vol.flat .front { opacity: 1; pointer-events: auto; box-shadow: 0 0 0 1px rgba(255,255,255,.06); }
-  .vol.flat.main { margin-left: calc(var(--k) * 8); margin-right: calc(var(--k) * 8); }
+  .vol.flat.main { width: calc(var(--k) * var(--w) * var(--s)); margin-left: calc(var(--k) * 12); margin-right: calc(var(--k) * 12); }
   /* study: 검은 행택 */
   .tagface { background: var(--tc) !important; color: var(--ti); text-align: left; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 11% 12% !important; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; overflow: hidden; }
   .tagface::before { content: ""; position: absolute; left: 50%; top: 7%; width: 9%; aspect-ratio: 1; border-radius: 50%; background: var(--bg); transform: translateX(-50%); z-index: 2; }
@@ -155,11 +161,37 @@
     .bar, .filters, .caption { padding-left: 18px; padding-right: 18px; }
     .shelf { padding: 30px 18px 0; }
     .baseline { margin: 0 18px; }
-    :root { --shelf: min(42vh, 320px); }
+    :root { --shelf: min(40vh, 330px); --big: 1.6; --cap: 360; }
     .caption { flex-direction: column; gap: 8px; }
     .caption .cm { display: block; margin: 4px 0 0; }
   }
+  /* 전체 목록: 모든 책을 실제 판형 비율대로, 바닥선에 맞춰 한 번에 */
+  .index { padding: 90px 28px 120px; --g: calc(min(15vw, 230px) / 220); }
+  .index-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 14px; font-size: 15px; }
+  .index-head h2 { font-weight: 400; font-size: clamp(28px, 3.8vw, 58px); line-height: 1; letter-spacing: -.01em; }
+  .index-head span { color: var(--muted); }
+  /* 엇갈린 격자: 한 줄에 5권, 다음 줄은 반 칸 밀려 4권 (JS가 자리를 정한다) */
+  .grid { --cols: 10; display: grid; grid-template-columns: repeat(var(--cols), 1fr); row-gap: clamp(36px, 4vw, 64px); padding-top: 50px; }
+  .ix { position: relative; display: flex; justify-content: center; align-items: center; }
+  .ix[hidden] { display: none; }
+  .ix img { display: block; width: calc(var(--g) * var(--w)); max-width: 100%; height: auto; aspect-ratio: var(--w) / var(--h); object-fit: fill;
+            background: #1A1614; box-shadow: 0 0 0 1px rgba(255,255,255,.05); transition: transform .3s; }
+  .ix:hover img { transform: translateY(-5px); }
+  .ix .in { position: absolute; left: 0; right: 0; top: calc(100% + 10px); text-align: center; font-size: 13px; line-height: 1.4; color: var(--muted);
+            word-break: keep-all; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .ix:hover .in, .ix:focus-visible .in { opacity: 1; }
+  .ix[aria-current="true"] img { box-shadow: 0 0 0 1px var(--text); }
+  .ix:focus-visible { outline: none; }
+  .ix:focus-visible img { outline: 2px solid var(--text); outline-offset: 5px; }
+  .to-top { margin-top: 80px; font-size: 15px; border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+  @media (max-width: 1000px) { .grid { --cols: 6; } .index { --g: calc(22vw / 220); } }
+  @media (max-width: 560px) {
+    .index { padding: 70px 18px 90px; --g: calc(36vw / 220); }
+    .grid { --cols: 4; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
     .vol, .vol .spine, .vol .front, .vbook, .vcover, .viewer { transition: none !important; }
   }
 
@@ -204,9 +236,10 @@
 </head>
 <body>
 
+<div class="stage">
 <nav class="bar">
   <a href="../">book is open door</a>
-  <span id="count"></span>
+  <a class="count" id="count" href="#index"></a>
 </nav>
 <div class="filters" id="filters" role="group" aria-label="분야"></div>
 
@@ -217,6 +250,13 @@
     <p><span class="ct" id="ct"></span><span class="cm" id="cm"></span></p>
     <button id="openMain">open the book</button>
   </div>
+</section>
+</div>
+
+<section class="index" id="index" aria-label="전체 목록">
+  <div class="index-head"><h2>all works</h2><span id="indexCount"></span></div>
+  <div class="grid" id="grid"></div>
+  <button class="to-top" id="toTop">back to the shelf</button>
 </section>
 
 <div class="tagview" id="tagView" role="dialog" aria-modal="true" aria-hidden="true">
@@ -1006,31 +1046,92 @@
     return el;
   });
 
+  // 전체 목록: 엇갈린 격자
+  const grid = document.getElementById('grid');
+  const items = works.map((b, i) => {
+    const el = document.createElement('button');
+    el.className = 'ix';
+    el.style.cssText = `--w:${b.w}; --h:${b.h};`;
+    el.setAttribute('aria-label', `${b.title}, 책장에서 보기`);
+    el.innerHTML = `<img src="${b.cover}" alt="" loading="lazy" decoding="async"><span class="in">${esc(b.title)}</span>`;
+    el.addEventListener('click', () => pickFromIndex(i));
+    grid.appendChild(el);
+    return el;
+  });
+  // 한 줄에 n권, 다음 줄은 반 칸 밀려 n-1권
+  function layoutGrid() {
+    const cols = parseInt(getComputedStyle(grid).getPropertyValue('--cols')) || 10;
+    const n = cols / 2;
+    let row = 1, k = 0;
+    visible.forEach(i => {
+      const odd = row % 2 === 1, per = odd ? n : n - 1;
+      items[i].style.gridRow = row;
+      items[i].style.gridColumn = `${(odd ? 1 : 2) + k * 2} / span 2`;
+      if (++k >= per) { k = 0; row++; }
+    });
+  }
+  window.addEventListener('resize', layoutGrid);
+
+  // 책장 안에서만 가로로 움직인다 (페이지는 세로로 움직이지 않게)
+  function centerShelf(i, smooth = true) {
+    const v = vols[i];
+    shelf.scrollTo({ left: v.offsetLeft + v.offsetWidth / 2 - shelf.clientWidth / 2, behavior: smooth && !reduce ? 'smooth' : 'auto' });
+  }
+  function pickFromIndex(i) {
+    if (!visible.includes(i)) applyFilter('all', false);
+    setMain(i, false);
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    setTimeout(() => { centerShelf(i); vols[i].focus({ preventScroll: true }); }, reduce ? 0 : 720);
+  }
+  document.getElementById('toTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
+
+  // 앞표지 책의 배율: --big까지 키우되 첫 화면 높이를 넘지 않게
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:absolute;visibility:hidden;height:calc(var(--k) * 1000);width:0';
+  document.body.appendChild(probe);
+  function fitMain() {
+    const b = works[main], k = probe.offsetHeight / 1000;
+    const big = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--big')) || 1.9;
+    const stage = document.querySelector('.stage'), wrap = document.querySelector('.shelf-wrap');
+    const overhead = wrap.offsetTop + (wrap.offsetHeight - shelf.offsetHeight) + 30 + 8; // 위 글자들 + 캡션 + 여백
+    const avail = Math.max(window.innerHeight - overhead, k * b.h);
+    const sc = Math.max(1, Math.min(big, avail / (k * b.h)));
+    vols.forEach((v, j) => j === main ? v.style.setProperty('--s', sc.toFixed(3)) : v.style.removeProperty('--s'));
+  }
+  window.addEventListener('resize', fitMain);
+
   function setMain(i, scroll = true) {
     main = i;
     vols.forEach((v, j) => v.classList.toggle('main', j === i));
+    fitMain();
+    items.forEach((v, j) => v.setAttribute('aria-current', j === i ? 'true' : 'false'));
     const b = works[i];
     document.getElementById('ct').textContent = b.title;
     document.getElementById('cm').textContent = [b.author, b.field].filter(Boolean).join(', ');
     document.getElementById('openMain').textContent = b.tag ? 'read the study' : b.flat ? 'view the poster' : 'open the book';
-    if (scroll) setTimeout(() => vols[i].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', inline: 'center', block: 'nearest' }), 380);
+    if (scroll) setTimeout(() => centerShelf(i), reduce ? 0 : 720);
   }
-  function applyFilter(key) {
+  function applyFilter(key, pickFirst = true) {
     filters.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.key === key ? 'true' : 'false'));
     visible = works.map((_, i) => i).filter(i => key === 'all' || works[i].type === key);
     vols.forEach((v, i) => v.hidden = !visible.includes(i));
+    items.forEach((v, i) => v.hidden = !visible.includes(i));
+    layoutGrid();
     const fi = works.findIndex(w => w.id === FEATURED);
-    setMain(key === 'all' && fi >= 0 ? fi : visible[0]);
-    document.getElementById('count').textContent = visible.length + (visible.length === 1 ? ' work' : ' works');
+    if (pickFirst) setMain(key === 'all' && fi >= 0 ? fi : visible[0]);
+    const n = visible.length + (visible.length === 1 ? ' work' : ' works');
+    document.getElementById('count').textContent = n + ' ↓';
+    document.getElementById('indexCount').textContent = n;
   }
   applyFilter('all');
   document.getElementById('openMain').addEventListener('click', () => openWork(main));
 
   // 마우스 휠로 책장을 옆으로
   shelf.addEventListener('wheel', e => {
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && shelf.scrollWidth > shelf.clientWidth) {
-      shelf.scrollLeft += e.deltaY; e.preventDefault();
-    }
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    const max = shelf.scrollWidth - shelf.clientWidth;
+    const canMove = e.deltaY > 0 ? shelf.scrollLeft < max - 1 : shelf.scrollLeft > 1;
+    if (max > 0 && canMove) { shelf.style.scrollBehavior = 'auto'; shelf.scrollLeft += e.deltaY; shelf.style.scrollBehavior = ''; e.preventDefault(); }
   }, { passive: false });
 
   // 상세
